@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Header } from '../../components/Header/Header';
 import { Footer } from '../../components/Footer/Footer';
@@ -15,6 +15,13 @@ export function ProductDetail() {
   const galeriaRef = useRef(null);
 
   const product = products.find((p) => p.id === id);
+
+  // 🎯 Rola pro topo quando abre a página ou troca de produto
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    setImagemAtual(0);
+    setQuantity(1);
+  }, [id]);
 
   if (!product) {
     return (
@@ -49,7 +56,6 @@ export function ProductDetail() {
 
   function handleTrocarImagem(i) {
     setImagemAtual(i);
-    // Volta pro topo da galeria com suavidade
     if (galeriaRef.current) {
       galeriaRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
