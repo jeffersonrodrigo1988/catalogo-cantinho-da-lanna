@@ -152,10 +152,10 @@ export function ProductDetail() {
                 </div>
               </div>
               <div className="detail-beneficio">
-                <span>📦</span>
+                <span>✨</span>
                 <div>
-                  <strong>Envio rápido</strong>
-                  <small>Postagem em 24h</small>
+                  <strong>Personalizável</strong>
+                  <small>Do seu jeitinho</small>
                 </div>
               </div>
             </div>

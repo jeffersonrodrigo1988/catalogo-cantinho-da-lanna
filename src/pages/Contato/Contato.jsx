@@ -161,11 +161,11 @@ export function Contato() {
             </div>
           </div>
           <div className="contato-horario-card">
-            <span className="contato-horario-icone">📍</span>
+            <span className="contato-horario-icone">💬</span>
             <div>
               <h3>Atendimento online</h3>
               <p>Atendemos todo o Brasil</p>
-              <p>Envio por Correios e transportadora</p>
+              <p>Fale com a gente pelo WhatsApp</p>
             </div>
           </div>
         </section>
