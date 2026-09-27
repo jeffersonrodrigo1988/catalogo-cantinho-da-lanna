@@ -49,7 +49,7 @@ export function Home() {
             <span className="home-hero-destaque">Cantinho da Lanna</span>
           </h1>
           <p>
-            Cadernos, canetas e mimos criados com carinho pra deixar seu dia
+            Mimos criados com carinho pra deixar seu dia
             mais fofo e organizado.
           </p>
 
