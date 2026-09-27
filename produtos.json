@@ -34,6 +34,19 @@
       "stock": 20,
       "featured": false,
       "id": "1790525608812"
+    },
+    {
+      "name": "Adesivo Redondo Tema Sonic",
+      "description": "Adesivo Redondo Tema Sonic",
+      "images": [
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790526044-1790526044.jpg",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790526046-1790526046.jpg"
+      ],
+      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790526044-1790526044.jpg",
+      "category": "Adesivos",
+      "stock": 20,
+      "featured": false,
+      "id": "1790526052322"
     }
   ]
 }
