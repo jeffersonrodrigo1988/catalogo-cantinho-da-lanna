@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Teste GitHub",
+    "description": "Teste de sincronização",
+    "price": 5,
+    "image": "https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=400",
+    "category": "Teste",
+    "stock": 1,
+    "featured": false,
+    "id": "1790483569491"
+  }
+]
