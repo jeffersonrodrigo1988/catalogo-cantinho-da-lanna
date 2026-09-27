@@ -113,14 +113,28 @@
   box-shadow: 0 4px 12px rgba(224, 122, 159, 0.35);
 }
 
-/* Miniatura - agora centralizada */
+/* Miniatura - agora em linha única, centralizada e com scroll */
 .detail-thumbs {
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding-bottom: 6px;
   justify-content: center;
-  flex-wrap: wrap;
+  scrollbar-width: thin;
+  scrollbar-color: var(--pink) transparent;
+}
+
+.detail-thumbs::-webkit-scrollbar {
+  height: 6px;
+}
+
+.detail-thumbs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.detail-thumbs::-webkit-scrollbar-thumb {
+  background: var(--pink);
+  border-radius: 999px;
 }
 
 .detail-thumb {
@@ -440,6 +454,16 @@
   .detail {
     padding: 1.25rem;
     gap: 2rem;
+  }
+
+  .detail-thumbs {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+  }
+
+  .detail-thumb {
+    width: 64px;
+    height: 64px;
   }
 
   .detail-beneficios {
