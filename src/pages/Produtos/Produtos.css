@@ -173,6 +173,23 @@
   color: var(--pink-dark);
 }
 
+.produtos-limpar-filtro {
+  background: var(--pink-soft);
+  color: var(--pink-dark);
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all var(--transition);
+  cursor: pointer;
+  border: 1px solid rgba(201, 165, 232, 0.3);
+}
+
+.produtos-limpar-filtro:hover {
+  background: var(--pink-dark);
+  color: var(--white);
+}
+
 /* ============ GRID ============ */
 .produtos-grid {
   display: grid;

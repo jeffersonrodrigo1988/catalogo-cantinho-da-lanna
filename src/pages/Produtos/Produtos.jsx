@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Header } from '../../components/Header/Header';
 import { Footer } from '../../components/Footer/Footer';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
@@ -7,8 +8,29 @@ import './Produtos.css';
 
 export function Produtos() {
   const { products, categories } = useProducts();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('Todos');
+
+  // 🎯 Lê a categoria da URL quando a página abre
+  useEffect(() => {
+    const cat = searchParams.get('cat');
+    if (cat && categories.includes(cat)) {
+      setCategory(cat);
+    } else {
+      setCategory('Todos');
+    }
+  }, [searchParams, categories]);
+
+  // 🎯 Quando clica numa categoria, atualiza a URL também
+  function handleSelecionarCategoria(novaCategoria) {
+    setCategory(novaCategoria);
+    if (novaCategoria === 'Todos') {
+      setSearchParams({});
+    } else {
+      setSearchParams({ cat: novaCategoria });
+    }
+  }
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
@@ -52,7 +74,7 @@ export function Produtos() {
                 <li key={cat}>
                   <button
                     className={`produtos-cat-item ${category === cat ? 'active' : ''}`}
-                    onClick={() => setCategory(cat)}
+                    onClick={() => handleSelecionarCategoria(cat)}
                   >
                     {cat}
                     <span className="produtos-cat-count">
@@ -79,7 +101,19 @@ export function Produtos() {
           <div className="produtos-toolbar">
             <p className="produtos-count">
               <strong>{filtered.length}</strong> produto{filtered.length !== 1 ? 's' : ''} encontrado{filtered.length !== 1 ? 's' : ''}
+              {category !== 'Todos' && (
+                <> em <strong>{category}</strong></>
+              )}
             </p>
+
+            {category !== 'Todos' && (
+              <button
+                className="produtos-limpar-filtro"
+                onClick={() => handleSelecionarCategoria('Todos')}
+              >
+                ✕ Limpar filtro
+              </button>
+            )}
           </div>
 
           {filtered.length > 0 ? (
