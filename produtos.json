@@ -1,32 +1,22 @@
-[
-  {
-    "name": "Topo de Bolo Corinthians",
-    "description": "Topo de Bolo Corinthians",
-    "images": [
-      "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790514540-1790514540.png",
-      "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790514993-1790514993.png",
-      "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790515023-1790515023.png",
-      "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790515026-1790515026.png"
-    ],
-    "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790514540-1790514540.png",
-    "category": "Topos de Bolo",
-    "stock": 1,
-    "featured": true,
-    "id": "1790483569491"
-  },
-  {
-    "name": "Topo de Bolo Eu amo Tetê",
-    "description": "Produto do Cantinho da Lanna 💕",
-    "images": [
-      "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790515410-1790515410.webp",
-      "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790515432-1790515432.webp",
-      "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790515433-1790515433.webp",
-      "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790515434-1790515434.webp"
-    ],
-    "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790515410-1790515410.webp",
-    "category": "Topos de Bolo",
-    "stock": 1,
-    "featured": false,
-    "id": "1790515488986"
-  }
-]
+{
+  "categories": [
+    "Adesivos"
+  ],
+  "products": [
+    {
+      "name": "Topo de Bolo Corinthians",
+      "description": "Topo de Bolo Corinthians",
+      "images": [
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790514540-1790514540.png",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790514993-1790514993.png",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790515023-1790515023.png",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790515026-1790515026.png"
+      ],
+      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790514540-1790514540.png",
+      "category": "Topos de Bolo",
+      "stock": 1,
+      "featured": true,
+      "id": "1790483569491"
+    }
+  ]
+}
