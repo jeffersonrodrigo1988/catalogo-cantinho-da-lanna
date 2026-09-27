@@ -9,25 +9,14 @@ export function Produtos() {
   const { products, categories } = useProducts();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('Todos');
-  const [sortBy, setSortBy] = useState('relevancia');
 
   const filtered = useMemo(() => {
-    let list = products.filter((p) => {
+    return products.filter((p) => {
       const matchCategory = category === 'Todos' || p.category === category;
       const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
       return matchCategory && matchSearch;
     });
-
-    if (sortBy === 'menor-preco') {
-      list = [...list].sort((a, b) => a.price - b.price);
-    } else if (sortBy === 'maior-preco') {
-      list = [...list].sort((a, b) => b.price - a.price);
-    } else if (sortBy === 'a-z') {
-      list = [...list].sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    return list;
-  }, [search, category, sortBy, products]);
+  }, [search, category, products]);
 
   return (
     <>
@@ -36,9 +25,8 @@ export function Produtos() {
       <section className="produtos-hero">
         <div className="produtos-hero-content">
           <span className="produtos-hero-tag">✨ Novidades toda semana</span>
-          <h1>Papelaria que encanta</h1>
+          <h1>Nossos produtos</h1>
           <p>Cadernos, canetas e mimos criados com carinho pra deixar seu dia mais fofo.</p>
-          <button className="produtos-hero-cta">Ver ofertas 🔥</button>
         </div>
       </section>
 
@@ -79,19 +67,11 @@ export function Produtos() {
           </div>
 
           <div className="produtos-sidebar-block">
-            <h3>Frete grátis</h3>
-            <label className="produtos-check">
-              <input type="checkbox" />
-              <span>Somente produtos com frete grátis</span>
-            </label>
-          </div>
-
-          <div className="produtos-sidebar-block">
-            <h3>Promoções</h3>
-            <label className="produtos-check">
-              <input type="checkbox" />
-              <span>Somente produtos em oferta</span>
-            </label>
+            <h3>Como comprar?</h3>
+            <p className="produtos-info">
+              Escolha os produtos e fale com a gente pelo WhatsApp pra saber
+              valores e fazer o pedido. 💕
+            </p>
           </div>
         </aside>
 
@@ -100,16 +80,6 @@ export function Produtos() {
             <p className="produtos-count">
               <strong>{filtered.length}</strong> produto{filtered.length !== 1 ? 's' : ''} encontrado{filtered.length !== 1 ? 's' : ''}
             </p>
-
-            <div className="produtos-sort">
-              <label>Ordenar por:</label>
-              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                <option value="relevancia">Relevância</option>
-                <option value="menor-preco">Menor preço</option>
-                <option value="maior-preco">Maior preço</option>
-                <option value="a-z">A - Z</option>
-              </select>
-            </div>
           </div>
 
           {filtered.length > 0 ? (

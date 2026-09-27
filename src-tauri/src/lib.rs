@@ -16,21 +16,33 @@ struct GithubPutBody {
 const GITHUB_USER: &str = "jeffersonrodrigo1988";
 const GITHUB_REPO: &str = "catalogo-cantinho-da-lanna";
 const GITHUB_FILE_PATH: &str = "produtos.json";
-const GITHUB_TOKEN: &str = "COLE_SEU_TOKEN_AQUI";
+
+fn get_token() -> String {
+    std::env::var("VITE_GITHUB_TOKEN").unwrap_or_else(|_| {
+        eprintln!("⚠️  VITE_GITHUB_TOKEN não configurado no arquivo .env");
+        String::new()
+    })
+}
 
 #[tauri::command]
 async fn salvar_produtos_github(produtos_json: String) -> Result<String, String> {
+    let token = get_token();
+    if token.is_empty() {
+        return Err("Token não configurado no arquivo .env".to_string());
+    }
+
     let client = reqwest::Client::new();
     let url = format!(
         "https://api.github.com/repos/{}/{}/contents/{}",
         GITHUB_USER, GITHUB_REPO, GITHUB_FILE_PATH
     );
 
+    // Pega o SHA do arquivo atual (se existir)
     let mut sha_atual: Option<String> = None;
     let res_get = client
         .get(&url)
         .header("User-Agent", "Tauri-App")
-        .header("Authorization", format!("token {}", GITHUB_TOKEN))
+        .header("Authorization", format!("token {}", token))
         .send()
         .await;
 
@@ -42,6 +54,7 @@ async fn salvar_produtos_github(produtos_json: String) -> Result<String, String>
         }
     }
 
+    // Codifica o JSON em Base64
     use base64::{engine::general_purpose, Engine as _};
     let content_b64 = general_purpose::STANDARD.encode(produtos_json.as_bytes());
 
@@ -57,7 +70,7 @@ async fn salvar_produtos_github(produtos_json: String) -> Result<String, String>
     let res_put = client
         .put(&url)
         .header("User-Agent", "Tauri-App")
-        .header("Authorization", format!("token {}", GITHUB_TOKEN))
+        .header("Authorization", format!("token {}", token))
         .json(&body)
         .send()
         .await
@@ -74,6 +87,11 @@ async fn salvar_produtos_github(produtos_json: String) -> Result<String, String>
 
 #[tauri::command]
 async fn carregar_produtos_github() -> Result<String, String> {
+    let token = get_token();
+    if token.is_empty() {
+        return Err("Token não configurado no arquivo .env".to_string());
+    }
+
     let client = reqwest::Client::new();
     let url = format!(
         "https://api.github.com/repos/{}/{}/contents/{}",
@@ -83,7 +101,7 @@ async fn carregar_produtos_github() -> Result<String, String> {
     let res = client
         .get(&url)
         .header("User-Agent", "Tauri-App")
-        .header("Authorization", format!("token {}", GITHUB_TOKEN))
+        .header("Authorization", format!("token {}", token))
         .send()
         .await
         .map_err(|e| format!("Erro de rede: {}", e))?;
@@ -114,6 +132,9 @@ async fn carregar_produtos_github() -> Result<String, String> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // Carrega variáveis do arquivo .env
+    let _ = dotenvy::dotenv();
+
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![

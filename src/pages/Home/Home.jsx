@@ -58,7 +58,7 @@ export function Home() {
                   <img src={p.image} alt={p.name} />
                   <div>
                     <strong>{p.name}</strong>
-                    <span>R$ {p.price.toFixed(2)}</span>
+                    <span>Ver detalhes</span>
                   </div>
                 </Link>
               ))}

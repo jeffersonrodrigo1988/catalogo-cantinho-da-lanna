@@ -65,18 +65,11 @@
   min-height: 2.6rem;
 }
 
-.price {
-  font-size: 1.35rem;
-  font-weight: 800;
+.consultar {
+  font-size: 0.82rem;
   color: var(--pink-dark);
+  font-weight: 600;
   margin-top: 0.35rem;
-  letter-spacing: -0.5px;
-}
-
-.parcela {
-  font-size: 0.75rem;
-  color: var(--gray);
-  font-weight: 400;
 }
 
 .badge {

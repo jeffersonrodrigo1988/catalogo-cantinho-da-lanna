@@ -44,7 +44,6 @@
   gap: 3rem;
 }
 
-/* Breadcrumb */
 .detail-breadcrumb {
   display: flex;
   align-items: center;
@@ -75,7 +74,6 @@
   align-items: start;
 }
 
-/* Galeria */
 .detail-gallery {
   position: sticky;
   top: 100px;
@@ -96,10 +94,10 @@
   object-fit: cover;
 }
 
-.detail-badge-destaque,
-.detail-badge-off {
+.detail-badge-destaque {
   position: absolute;
   top: 1.25rem;
+  left: 1.25rem;
   font-size: 0.75rem;
   font-weight: 700;
   padding: 0.4rem 1rem;
@@ -107,18 +105,8 @@
   color: var(--white);
   z-index: 1;
   letter-spacing: 0.3px;
-}
-
-.detail-badge-destaque {
-  left: 1.25rem;
   background: linear-gradient(135deg, var(--pink-dark), var(--pink));
   box-shadow: 0 4px 12px rgba(224, 122, 159, 0.35);
-}
-
-.detail-badge-off {
-  right: 1.25rem;
-  background: #ff5c5c;
-  box-shadow: 0 4px 12px rgba(255, 92, 92, 0.35);
 }
 
 /* Info */
@@ -143,23 +131,6 @@
   letter-spacing: -0.5px;
 }
 
-.detail-stars {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-}
-
-.detail-stars-icons {
-  color: #f7b731;
-  letter-spacing: 2px;
-}
-
-.detail-stars small {
-  color: var(--gray);
-  font-size: 0.8rem;
-}
-
 .detail-desc {
   color: var(--gray);
   line-height: 1.7;
@@ -167,41 +138,34 @@
   padding: 0.5rem 0;
 }
 
-/* Preços */
-.detail-precos {
+/* Bloco de consultar */
+.detail-consultar {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.85rem;
+  background: linear-gradient(135deg, var(--pink-soft) 0%, #fff 100%);
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius);
+  border: 1.5px solid rgba(247, 168, 196, 0.3);
   margin-top: 0.5rem;
 }
 
-.detail-preco-antigo {
-  font-size: 1rem;
-  color: var(--gray);
-  text-decoration: line-through;
+.detail-consultar-icone {
+  font-size: 1.75rem;
+  flex-shrink: 0;
 }
 
-.detail-preco-atual {
-  font-size: 2.5rem;
-  font-weight: 800;
+.detail-consultar strong {
+  display: block;
   color: var(--pink-dark);
-  letter-spacing: -1px;
+  font-size: 1rem;
+  font-weight: 700;
 }
 
-.detail-parcela {
-  font-size: 0.9rem;
+.detail-consultar small {
+  display: block;
   color: var(--gray);
-}
-
-.detail-parcela strong {
-  color: var(--brown);
-}
-
-.detail-frete {
-  font-size: 0.9rem;
-  color: #2e9e5b;
-  font-weight: 600;
-  margin-top: 0.25rem;
+  font-size: 0.82rem;
 }
 
 /* Estoque */
@@ -402,7 +366,6 @@
   gap: 1.5rem;
 }
 
-/* Botão genérico */
 .detail-btn-primary {
   display: inline-block;
   background: var(--pink-dark);
@@ -433,10 +396,6 @@
 
   .detail-info h1 {
     font-size: 1.75rem;
-  }
-
-  .detail-preco-atual {
-    font-size: 2rem;
   }
 }
 
