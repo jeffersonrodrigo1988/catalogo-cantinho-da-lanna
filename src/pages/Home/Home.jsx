@@ -4,7 +4,22 @@ import { Header } from '../../components/Header/Header';
 import { Footer } from '../../components/Footer/Footer';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
 import { useProducts } from '../../context/ProductsContext';
+import adesivoImg from '../../assets/categorias/adesivo.png';
+import calendarioImg from '../../assets/categorias/calendario.png';
+import envelopeImg from '../../assets/categorias/envelope.png';
+import florImg from '../../assets/categorias/flor.png';
+import tagImg from '../../assets/categorias/tag.png';
+import topoImg from '../../assets/categorias/topo.png';
 import './Home.css';
+
+const categoriasDestaque = [
+  { nome: 'Adesivos', img: adesivoImg },
+  { nome: 'Calendários', img: calendarioImg },
+  { nome: 'Envelopes', img: envelopeImg },
+  { nome: 'Flores', img: florImg },
+  { nome: 'Tags', img: tagImg },
+  { nome: 'Topos de Bolo', img: topoImg },
+];
 
 export function Home() {
   const { products } = useProducts();
@@ -55,7 +70,7 @@ export function Home() {
             <div className="home-busca-resultados">
               {buscaRapida.map((p) => (
                 <Link key={p.id} to={`/produto/${p.id}`} className="home-busca-item">
-                  <img src={p.image} alt={p.name} />
+                  <img src={p.images?.[0] || p.image} alt={p.name} />
                   <div>
                     <strong>{p.name}</strong>
                     <span>Ver detalhes</span>
@@ -79,26 +94,18 @@ export function Home() {
       <section className="home-categorias">
         <h2>Navegue por categoria</h2>
         <div className="home-categorias-grid">
-          <Link to="/produtos" className="home-cat-card">
-            <span className="home-cat-emoji">📓</span>
-            <strong>Cadernos</strong>
-          </Link>
-          <Link to="/produtos" className="home-cat-card">
-            <span className="home-cat-emoji">🖊️</span>
-            <strong>Canetas</strong>
-          </Link>
-          <Link to="/produtos" className="home-cat-card">
-            <span className="home-cat-emoji">🎨</span>
-            <strong>Lápis e Cores</strong>
-          </Link>
-          <Link to="/produtos" className="home-cat-card">
-            <span className="home-cat-emoji">✨</span>
-            <strong>Criativa</strong>
-          </Link>
-          <Link to="/produtos" className="home-cat-card">
-            <span className="home-cat-emoji">🎁</span>
-            <strong>Presentes</strong>
-          </Link>
+          {categoriasDestaque.map((cat) => (
+            <Link
+              key={cat.nome}
+              to={`/produtos?cat=${encodeURIComponent(cat.nome)}`}
+              className="home-cat-card"
+            >
+              <div className="home-cat-imgwrap">
+                <img src={cat.img} alt={cat.nome} />
+              </div>
+              <strong>{cat.nome}</strong>
+            </Link>
+          ))}
         </div>
       </section>
 
