@@ -144,18 +144,6 @@
       "stock": 10,
       "featured": true,
       "id": "1790528313510"
-    },
-    {
-      "name": "Flores e Folhas",
-      "description": "Flores 🤩",
-      "images": [
-        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790528568-1790528568.jpg"
-      ],
-      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790528568-1790528568.jpg",
-      "category": "Flores",
-      "stock": 2,
-      "featured": false,
-      "id": "1790528593508"
     }
   ]
 }
