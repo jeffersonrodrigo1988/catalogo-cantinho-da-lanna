@@ -1,6 +1,6 @@
 /* ============ HERO / BANNER ============ */
 .produtos-hero {
-  background: linear-gradient(135deg, var(--pink-dark) 0%, var(--pink) 60%, #ffd6e4 100%);
+  background: linear-gradient(135deg, #8b6bb8 0%, #b89dd9 45%, #d9bce8 75%, #f0d5f5 100%);
   color: var(--white);
   padding: 4rem 2rem;
   text-align: center;
@@ -247,7 +247,6 @@
     font-size: 0.85rem;
   }
 
-  /* 🎯 Grid em 1 coluna - ocupa a tela toda */
   .produtos-grid {
     grid-template-columns: 1fr;
     gap: 1rem;

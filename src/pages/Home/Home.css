@@ -1,9 +1,9 @@
 /* ============ HERO ============ */
 .home-hero {
   background:
-    radial-gradient(circle at 15% 30%, rgba(255, 255, 255, 0.15), transparent 40%),
-    radial-gradient(circle at 85% 70%, rgba(255, 255, 255, 0.12), transparent 40%),
-    linear-gradient(135deg, #e07a9f 0%, #f7a8c4 55%, #ffd6e4 100%);
+    radial-gradient(circle at 15% 30%, rgba(255, 255, 255, 0.18), transparent 40%),
+    radial-gradient(circle at 85% 70%, rgba(255, 255, 255, 0.15), transparent 40%),
+    linear-gradient(135deg, #8b6bb8 0%, #b89dd9 45%, #d9bce8 75%, #f0d5f5 100%);
   color: var(--white);
   padding: 6rem 2rem 7rem;
   text-align: center;
@@ -80,7 +80,7 @@
 }
 
 .home-hero-busca input::placeholder {
-  color: #b8a8a3;
+  color: #b8a8c0;
 }
 
 .home-busca-resultados {
@@ -209,7 +209,7 @@
   align-items: center;
   gap: 0.6rem;
   transition: all var(--transition);
-  border: 1px solid rgba(247, 168, 196, 0.1);
+  border: 1px solid rgba(201, 165, 232, 0.15);
 }
 
 .home-cat-card:hover {
@@ -378,7 +378,6 @@
     font-size: 1.45rem;
   }
 
-  /* 🎯 Grid em 1 coluna - ocupa a tela toda */
   .home-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
