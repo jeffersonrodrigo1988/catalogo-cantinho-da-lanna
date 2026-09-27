@@ -1,0 +1,139 @@
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Header } from '../../components/Header/Header';
+import { Footer } from '../../components/Footer/Footer';
+import { ProductCard } from '../../components/ProductCard/ProductCard';
+import { useProducts } from '../../context/ProductsContext';
+import './Home.css';
+
+export function Home() {
+  const { products } = useProducts();
+  const [search, setSearch] = useState('');
+
+  const destaques = useMemo(
+    () => products.filter((p) => p.featured),
+    [products]
+  );
+
+  const buscaRapida = useMemo(() => {
+    if (!search.trim()) return [];
+    return products
+      .filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
+      .slice(0, 4);
+  }, [search, products]);
+
+  return (
+    <>
+      <Header />
+
+      <section className="home-hero">
+        <div className="home-hero-content">
+          <span className="home-hero-tag">🌸 Papelaria com amor</span>
+          <h1>
+            Bem-vinda ao <br />
+            <span className="home-hero-destaque">Cantinho da Lanna</span>
+          </h1>
+          <p>
+            Cadernos, canetas e mimos criados com carinho pra deixar seu dia
+            mais fofo e organizado.
+          </p>
+
+          <div className="home-hero-busca">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.3-4.3"/>
+            </svg>
+            <input
+              type="text"
+              placeholder="Buscar produtos..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
+          {buscaRapida.length > 0 && (
+            <div className="home-busca-resultados">
+              {buscaRapida.map((p) => (
+                <Link key={p.id} to={`/produto/${p.id}`} className="home-busca-item">
+                  <img src={p.image} alt={p.name} />
+                  <div>
+                    <strong>{p.name}</strong>
+                    <span>R$ {p.price.toFixed(2)}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          <div className="home-hero-actions">
+            <Link to="/produtos" className="home-btn-primary">
+              Ver catálogo completo
+            </Link>
+            <Link to="/sobre" className="home-btn-ghost">
+              Sobre nós
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="home-categorias">
+        <h2>Navegue por categoria</h2>
+        <div className="home-categorias-grid">
+          <Link to="/produtos" className="home-cat-card">
+            <span className="home-cat-emoji">📓</span>
+            <strong>Cadernos</strong>
+          </Link>
+          <Link to="/produtos" className="home-cat-card">
+            <span className="home-cat-emoji">🖊️</span>
+            <strong>Canetas</strong>
+          </Link>
+          <Link to="/produtos" className="home-cat-card">
+            <span className="home-cat-emoji">🎨</span>
+            <strong>Lápis e Cores</strong>
+          </Link>
+          <Link to="/produtos" className="home-cat-card">
+            <span className="home-cat-emoji">✨</span>
+            <strong>Criativa</strong>
+          </Link>
+          <Link to="/produtos" className="home-cat-card">
+            <span className="home-cat-emoji">🎁</span>
+            <strong>Presentes</strong>
+          </Link>
+        </div>
+      </section>
+
+      <section className="home-destaques">
+        <div className="home-destaques-head">
+          <div>
+            <h2>Destaques da semana</h2>
+            <p>Os produtos mais amados pelas clientes</p>
+          </div>
+          <Link to="/produtos" className="home-ver-todos">
+            Ver todos
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </Link>
+        </div>
+
+        <div className="home-grid">
+          {destaques.map((p) => (
+            <ProductCard key={p.id} product={p} />
+          ))}
+        </div>
+      </section>
+
+      <section className="home-cta">
+        <div className="home-cta-content">
+          <h2>Não achou o que procurava?</h2>
+          <p>Fale com a gente que a Lanna personaliza pra você!</p>
+          <Link to="/contato" className="home-btn-primary">
+            Fale conosco
+          </Link>
+        </div>
+      </section>
+
+      <Footer />
+    </>
+  );
+}
