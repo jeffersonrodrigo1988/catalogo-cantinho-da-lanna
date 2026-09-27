@@ -64,6 +64,20 @@
       "stock": 10,
       "featured": false,
       "id": "1790526184656"
+    },
+    {
+      "name": "Adesivo Redondo Tema Tinker Bell",
+      "description": "Produto do Cantinho da Lanna 💕",
+      "images": [
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790526358-1790526358.jpg",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790526359-1790526359.jpg",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790526361-1790526361.jpg"
+      ],
+      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790526358-1790526358.jpg",
+      "category": "Adesivos",
+      "stock": 20,
+      "featured": false,
+      "id": "1790526366831"
     }
   ]
 }
