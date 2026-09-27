@@ -92,6 +92,20 @@
       "stock": 20,
       "featured": true,
       "id": "1790526487919"
+    },
+    {
+      "name": "Envelope Dízimos e Ofertas",
+      "description": "Envelope Dízimos e Ofertas",
+      "images": [
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527262-1790527262.jpg",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527264-1790527264.jpg",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527265-1790527265.jpg"
+      ],
+      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527262-1790527262.jpg",
+      "category": "Envelopes",
+      "stock": 50,
+      "featured": true,
+      "id": "1790527295626"
     }
   ]
 }
