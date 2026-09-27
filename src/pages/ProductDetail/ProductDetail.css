@@ -113,12 +113,14 @@
   box-shadow: 0 4px 12px rgba(224, 122, 159, 0.35);
 }
 
-/* Miniatura */
+/* Miniatura - agora centralizada */
 .detail-thumbs {
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
   padding-bottom: 4px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .detail-thumb {
