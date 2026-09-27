@@ -21,12 +21,24 @@ export function Admin() {
   const [senha, setSenha] = useState('');
   const [erroSenha, setErroSenha] = useState('');
 
-  const { products, categories, addProduct, updateProduct, removeProduct } = useProducts();
+  const {
+    products,
+    categories,
+    customCategories,
+    addProduct,
+    updateProduct,
+    removeProduct,
+    addCategory,
+    removeCategory,
+  } = useProducts();
 
   const [form, setForm] = useState(FORM_VAZIO);
   const [editandoId, setEditandoId] = useState(null);
   const [mensagem, setMensagem] = useState('');
   const [enviandoImagem, setEnviandoImagem] = useState(false);
+
+  // Categorias
+  const [novaCategoria, setNovaCategoria] = useState('');
 
   if (!isTauri()) {
     return (
@@ -68,7 +80,6 @@ export function Admin() {
     }));
   }
 
-  // Converte arquivo pra base64
   function arquivoParaBase64(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -78,7 +89,6 @@ export function Admin() {
     });
   }
 
-  // Upload de múltiplas imagens
   async function handleUploadImagens(e) {
     const arquivos = Array.from(e.target.files || []);
     if (arquivos.length === 0) return;
@@ -90,7 +100,6 @@ export function Admin() {
       const novasUrls = [];
 
       for (const arquivo of arquivos) {
-        // Limite de 3MB por imagem
         if (arquivo.size > 3 * 1024 * 1024) {
           alert(`Imagem "${arquivo.name}" é muito grande (máx 3MB). Pulando.`);
           continue;
@@ -120,7 +129,6 @@ export function Admin() {
     }
   }
 
-  // Remove imagem da lista
   function handleRemoverImagem(index) {
     setForm((prev) => ({
       ...prev,
@@ -145,7 +153,7 @@ export function Admin() {
       name: form.name.trim(),
       description: form.description.trim() || 'Produto do Cantinho da Lanna 💕',
       images: form.images,
-      image: form.images[0], // compatibilidade com versões antigas
+      image: form.images[0],
       category: form.category.trim(),
       stock: parseInt(form.stock) || 10,
       featured: form.featured,
@@ -187,6 +195,30 @@ export function Admin() {
       removeProduct(id);
       setMensagem('🗑️ Produto excluído');
       setTimeout(() => setMensagem(''), 2500);
+    }
+  }
+
+  // === CATEGORIAS ===
+  function handleAddCategoria(e) {
+    e.preventDefault();
+    if (!novaCategoria.trim()) return;
+    addCategory(novaCategoria);
+    setNovaCategoria('');
+    setMensagem('✅ Categoria adicionada!');
+    setTimeout(() => setMensagem(''), 2000);
+  }
+
+  function handleRemoveCategoria(nome) {
+    // Checa se tem produto usando essa categoria
+    const usada = products.some((p) => p.category === nome);
+    if (usada) {
+      alert(`Não é possível excluir "${nome}" — tem produtos usando essa categoria.`);
+      return;
+    }
+    if (confirm(`Excluir categoria "${nome}"?`)) {
+      removeCategory(nome);
+      setMensagem('🗑️ Categoria excluída');
+      setTimeout(() => setMensagem(''), 2000);
     }
   }
 
@@ -240,6 +272,57 @@ export function Admin() {
 
         {mensagem && <div className="admin-mensagem">{mensagem}</div>}
 
+        {/* === GERENCIAR CATEGORIAS === */}
+        <section className="admin-form-section">
+          <h2>📂 Categorias</h2>
+          <p className="admin-hint">
+            Adicione as categorias que vai usar nos produtos.
+          </p>
+
+          <form className="admin-cat-add" onSubmit={handleAddCategoria}>
+            <input
+              type="text"
+              placeholder="Nome da nova categoria (ex: Cadernos)"
+              value={novaCategoria}
+              onChange={(e) => setNovaCategoria(e.target.value)}
+            />
+            <button type="submit" className="admin-btn-primary">
+              ➕ Adicionar
+            </button>
+          </form>
+
+          {categories.filter((c) => c !== 'Todos').length === 0 ? (
+            <p className="admin-vazio">Nenhuma categoria ainda 😢</p>
+          ) : (
+            <div className="admin-cat-list">
+              {categories
+                .filter((c) => c !== 'Todos')
+                .map((cat) => {
+                  const usada = products.some((p) => p.category === cat);
+                  const totalProdutos = products.filter((p) => p.category === cat).length;
+
+                  return (
+                    <div key={cat} className="admin-cat-item">
+                      <span className="admin-cat-nome">{cat}</span>
+                      <span className="admin-cat-count">
+                        {totalProdutos} produto{totalProdutos !== 1 ? 's' : ''}
+                      </span>
+                      <button
+                        className="admin-cat-remove"
+                        onClick={() => handleRemoveCategoria(cat)}
+                        disabled={usada}
+                        title={usada ? 'Em uso' : 'Excluir'}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  );
+                })}
+            </div>
+          )}
+        </section>
+
+        {/* === FORMULÁRIO PRODUTO === */}
         <section className="admin-form-section">
           <h2>{editandoId ? '✏️ Editar produto' : '➕ Novo produto'}</h2>
 
@@ -258,21 +341,20 @@ export function Admin() {
 
               <label className="admin-field">
                 <span>Categoria *</span>
-                <input
-                  type="text"
+                <select
                   name="category"
                   value={form.category}
                   onChange={handleChange}
-                  placeholder="Ex: Cadernos"
-                  list="categorias-existentes"
-                />
-                <datalist id="categorias-existentes">
+                >
+                  <option value="">Selecione...</option>
                   {categories
                     .filter((c) => c !== 'Todos')
-                    .map((c) => (
-                      <option key={c} value={c} />
+                    .map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
                     ))}
-                </datalist>
+                </select>
               </label>
 
               <label className="admin-field">
@@ -286,7 +368,6 @@ export function Admin() {
                 />
               </label>
 
-              {/* Upload de imagens */}
               <div className="admin-field admin-field-wide">
                 <span>Fotos do produto *</span>
 

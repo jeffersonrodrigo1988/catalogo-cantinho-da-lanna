@@ -7,25 +7,30 @@ const ProductsContext = createContext(null);
 
 export function ProductsProvider({ children }) {
   const [products, setProducts] = useState([]);
+  const [customCategories, setCustomCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [erro, setErro] = useState(null);
 
   useEffect(() => {
     async function carregar() {
       try {
+        let dados;
         if (isTauri()) {
-          // Se estiver no app do PC (Tauri), usa o comando Rust
           const jsonStr = await invoke('carregar_produtos_github');
-          setProducts(JSON.parse(jsonStr));
+          dados = JSON.parse(jsonStr);
         } else {
-          // Se estiver no navegador/site, lê direto do GitHub via fetch
-          const lista = await carregarProdutosDoGithub();
-          setProducts(lista);
+          dados = await carregarProdutosDoGithub();
+        }
+
+        // Compatível com formato antigo (array) e novo (objeto)
+        if (Array.isArray(dados)) {
+          setProducts(dados);
+          setCustomCategories([]);
+        } else if (dados && typeof dados === 'object') {
+          setProducts(dados.products || []);
+          setCustomCategories(dados.categories || []);
         }
       } catch (err) {
-        console.error('❌ Erro ao carregar produtos:', err);
-        setErro(err.message || String(err));
-        setProducts([]);
+        console.error('Erro ao carregar:', err);
       } finally {
         setLoading(false);
       }
@@ -33,49 +38,73 @@ export function ProductsProvider({ children }) {
     carregar();
   }, []);
 
-  async function sincronizar(lista) {
-    if (!isTauri()) return; // Só sincroniza no app do PC
+  async function sincronizar(novosProdutos, novasCategorias) {
+    if (!isTauri()) return;
     try {
-      const jsonStr = JSON.stringify(lista, null, 2);
+      const dados = {
+        categories: novasCategorias,
+        products: novosProdutos,
+      };
+      const jsonStr = JSON.stringify(dados, null, 2);
       await invoke('salvar_produtos_github', { produtosJson: jsonStr });
-      console.log('✅ Produtos sincronizados com o GitHub!');
+      console.log('✅ Sincronizado!');
     } catch (err) {
       console.error('❌ Erro ao sincronizar:', err);
-      alert('Erro ao salvar no GitHub: ' + err);
+      alert('Erro ao salvar: ' + err);
     }
   }
 
   function addProduct(product) {
-    const novoProduto = { ...product, id: String(Date.now()) };
-    const novaLista = [...products, novoProduto];
-    setProducts(novaLista);
-    sincronizar(novaLista);
+    const novo = { ...product, id: String(Date.now()) };
+    const lista = [...products, novo];
+    setProducts(lista);
+    sincronizar(lista, customCategories);
   }
 
   function updateProduct(id, product) {
-    const novaLista = products.map((p) => (p.id === id ? { ...product, id } : p));
-    setProducts(novaLista);
-    sincronizar(novaLista);
+    const lista = products.map((p) => (p.id === id ? { ...product, id } : p));
+    setProducts(lista);
+    sincronizar(lista, customCategories);
   }
 
   function removeProduct(id) {
-    const novaLista = products.filter((p) => p.id !== id);
-    setProducts(novaLista);
-    sincronizar(novaLista);
+    const lista = products.filter((p) => p.id !== id);
+    setProducts(lista);
+    sincronizar(lista, customCategories);
   }
 
-  const categories = ['Todos', ...new Set(products.map((p) => p.category))];
+  function addCategory(nome) {
+    const limpo = nome.trim();
+    if (!limpo) return;
+    if (customCategories.includes(limpo)) return;
+    const lista = [...customCategories, limpo];
+    setCustomCategories(lista);
+    sincronizar(products, lista);
+  }
+
+  function removeCategory(nome) {
+    const lista = customCategories.filter((c) => c !== nome);
+    setCustomCategories(lista);
+    sincronizar(products, lista);
+  }
+
+  // Categorias finais = custom + derivadas dos produtos
+  const categoriesFromProducts = products.map((p) => p.category).filter(Boolean);
+  const todasCategorias = [...new Set([...customCategories, ...categoriesFromProducts])].sort();
+  const categories = ['Todos', ...todasCategorias];
 
   return (
     <ProductsContext.Provider
       value={{
         products,
         categories,
+        customCategories,
         loading,
-        erro,
         addProduct,
         updateProduct,
         removeProduct,
+        addCategory,
+        removeCategory,
       }}
     >
       {children}
