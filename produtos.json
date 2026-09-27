@@ -47,6 +47,23 @@
       "stock": 20,
       "featured": false,
       "id": "1790526052322"
+    },
+    {
+      "name": "Adesivo Redondo Tema Chá de Casa Nova",
+      "description": "Adesivo Redondo Tema Chá de Casa Nova",
+      "images": [
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790526171-1790526171.jpg",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790526173-1790526173.jpg",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790526174-1790526174.jpg",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790526176-1790526176.jpg",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790526177-1790526177.jpg",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790526179-1790526179.jpg"
+      ],
+      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790526171-1790526171.jpg",
+      "category": "Adesivos",
+      "stock": 10,
+      "featured": false,
+      "id": "1790526184656"
     }
   ]
 }
