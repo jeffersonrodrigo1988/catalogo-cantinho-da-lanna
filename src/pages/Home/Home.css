@@ -55,7 +55,6 @@
   line-height: 1.6;
 }
 
-/* Busca */
 .home-hero-busca {
   margin-top: 1.25rem;
   width: 100%;
@@ -84,7 +83,6 @@
   color: #b8a8a3;
 }
 
-/* Resultados */
 .home-busca-resultados {
   width: 100%;
   max-width: 540px;
@@ -133,7 +131,6 @@
   font-weight: 700;
 }
 
-/* Ações */
 .home-hero-actions {
   margin-top: 1.25rem;
   display: flex;
@@ -353,6 +350,24 @@
 
   .home-categorias h2 {
     font-size: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .home-categorias-grid {
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .home-cat-card {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .home-cat-emoji {
+    font-size: 1.75rem;
+  }
+
+  .home-cat-card strong {
+    font-size: 0.8rem;
   }
 
   .home-destaques {
@@ -363,8 +378,15 @@
     font-size: 1.45rem;
   }
 
+  /* 🎯 Grid em 1 coluna - ocupa a tela toda */
   .home-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 0.9rem;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .home-hero h1 {
+    font-size: 1.85rem;
   }
 }
