@@ -11,6 +11,7 @@ export function ProductDetail() {
   const { id } = useParams();
   const { products } = useProducts();
   const [quantity, setQuantity] = useState(1);
+  const [imagemAtual, setImagemAtual] = useState(0);
 
   const product = products.find((p) => p.id === id);
 
@@ -32,6 +33,10 @@ export function ProductDetail() {
       </>
     );
   }
+
+  const fotos = product.images?.length > 0
+    ? product.images
+    : (product.image ? [product.image] : []);
 
   const relacionados = products
     .filter((p) => p.category === product.category && p.id !== product.id)
@@ -60,8 +65,22 @@ export function ProductDetail() {
           <div className="detail-gallery">
             <div className="detail-gallery-main">
               {product.featured && <span className="detail-badge-destaque">✨ Destaque</span>}
-              <img src={product.image} alt={product.name} />
+              <img src={fotos[imagemAtual]} alt={product.name} />
             </div>
+
+            {fotos.length > 1 && (
+              <div className="detail-thumbs">
+                {fotos.map((foto, i) => (
+                  <button
+                    key={i}
+                    className={`detail-thumb ${i === imagemAtual ? 'active' : ''}`}
+                    onClick={() => setImagemAtual(i)}
+                  >
+                    <img src={foto} alt={`Foto ${i + 1}`} />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="detail-info">

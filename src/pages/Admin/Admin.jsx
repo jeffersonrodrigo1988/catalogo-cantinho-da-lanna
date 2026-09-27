@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { invoke } from '@tauri-apps/api/core';
 import { Header } from '../../components/Header/Header';
 import { useProducts } from '../../context/ProductsContext';
 import { ADMIN_PASSWORD } from '../../config';
@@ -9,7 +10,7 @@ import './Admin.css';
 const FORM_VAZIO = {
   name: '',
   description: '',
-  image: '',
+  images: [],
   category: '',
   stock: '',
   featured: false,
@@ -25,6 +26,7 @@ export function Admin() {
   const [form, setForm] = useState(FORM_VAZIO);
   const [editandoId, setEditandoId] = useState(null);
   const [mensagem, setMensagem] = useState('');
+  const [enviandoImagem, setEnviandoImagem] = useState(false);
 
   if (!isTauri()) {
     return (
@@ -66,6 +68,66 @@ export function Admin() {
     }));
   }
 
+  // Converte arquivo pra base64
+  function arquivoParaBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Upload de múltiplas imagens
+  async function handleUploadImagens(e) {
+    const arquivos = Array.from(e.target.files || []);
+    if (arquivos.length === 0) return;
+
+    setEnviandoImagem(true);
+    setMensagem('📤 Enviando imagens...');
+
+    try {
+      const novasUrls = [];
+
+      for (const arquivo of arquivos) {
+        // Limite de 3MB por imagem
+        if (arquivo.size > 3 * 1024 * 1024) {
+          alert(`Imagem "${arquivo.name}" é muito grande (máx 3MB). Pulando.`);
+          continue;
+        }
+
+        const base64 = await arquivoParaBase64(arquivo);
+        const url = await invoke('upload_imagem_github', {
+          nomeArquivo: arquivo.name,
+          dadosBase64: base64,
+        });
+        novasUrls.push(url);
+      }
+
+      setForm((prev) => ({
+        ...prev,
+        images: [...prev.images, ...novasUrls],
+      }));
+
+      setMensagem(`✅ ${novasUrls.length} imagem(ns) enviada(s)!`);
+      setTimeout(() => setMensagem(''), 2500);
+    } catch (err) {
+      console.error('Erro no upload:', err);
+      setMensagem('❌ Erro ao enviar imagem: ' + err);
+    } finally {
+      setEnviandoImagem(false);
+      e.target.value = '';
+    }
+  }
+
+  // Remove imagem da lista
+  function handleRemoverImagem(index) {
+    setForm((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+  }
+
   function handleSubmit(e) {
     e.preventDefault();
 
@@ -74,10 +136,16 @@ export function Admin() {
       return;
     }
 
+    if (form.images.length === 0) {
+      setMensagem('⚠️ Adicione pelo menos 1 imagem');
+      return;
+    }
+
     const produtoFinal = {
       name: form.name.trim(),
       description: form.description.trim() || 'Produto do Cantinho da Lanna 💕',
-      image: form.image.trim() || 'https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=400',
+      images: form.images,
+      image: form.images[0], // compatibilidade com versões antigas
       category: form.category.trim(),
       stock: parseInt(form.stock) || 10,
       featured: form.featured,
@@ -100,7 +168,7 @@ export function Admin() {
     setForm({
       name: produto.name,
       description: produto.description,
-      image: produto.image,
+      images: produto.images || (produto.image ? [produto.image] : []),
       category: produto.category,
       stock: String(produto.stock || ''),
       featured: produto.featured || false,
@@ -218,16 +286,51 @@ export function Admin() {
                 />
               </label>
 
-              <label className="admin-field admin-field-wide">
-                <span>URL da imagem</span>
-                <input
-                  type="text"
-                  name="image"
-                  value={form.image}
-                  onChange={handleChange}
-                  placeholder="https://..."
-                />
-              </label>
+              {/* Upload de imagens */}
+              <div className="admin-field admin-field-wide">
+                <span>Fotos do produto *</span>
+
+                <label className="admin-upload">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleUploadImagens}
+                    disabled={enviandoImagem}
+                    style={{ display: 'none' }}
+                  />
+                  <div className="admin-upload-box">
+                    <span className="admin-upload-emoji">
+                      {enviandoImagem ? '⏳' : '📷'}
+                    </span>
+                    <strong>
+                      {enviandoImagem
+                        ? 'Enviando imagens...'
+                        : 'Clique pra escolher fotos do PC'}
+                    </strong>
+                    <small>Pode escolher várias de uma vez (máx 3MB cada)</small>
+                  </div>
+                </label>
+
+                {form.images.length > 0 && (
+                  <div className="admin-images-preview">
+                    {form.images.map((url, i) => (
+                      <div key={i} className="admin-image-item">
+                        <img src={url} alt={`Foto ${i + 1}`} />
+                        {i === 0 && <span className="admin-image-principal">Principal</span>}
+                        <button
+                          type="button"
+                          className="admin-image-remove"
+                          onClick={() => handleRemoverImagem(i)}
+                          title="Remover"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               <label className="admin-field admin-field-wide">
                 <span>Descrição</span>
@@ -252,7 +355,11 @@ export function Admin() {
             </div>
 
             <div className="admin-form-actions">
-              <button type="submit" className="admin-btn-primary">
+              <button
+                type="submit"
+                className="admin-btn-primary"
+                disabled={enviandoImagem}
+              >
                 {editandoId ? '💾 Salvar alterações' : '➕ Adicionar produto'}
               </button>
 
@@ -278,34 +385,42 @@ export function Admin() {
             <p className="admin-vazio">Nenhum produto cadastrado ainda 😢</p>
           ) : (
             <div className="admin-lista">
-              {products.map((p) => (
-                <article key={p.id} className="admin-item">
-                  <img src={p.image} alt={p.name} />
+              {products.map((p) => {
+                const capa = p.images?.[0] || p.image;
+                return (
+                  <article key={p.id} className="admin-item">
+                    <img src={capa} alt={p.name} />
 
-                  <div className="admin-item-info">
-                    <span className="admin-item-cat">{p.category}</span>
-                    <strong>{p.name}</strong>
-                    {p.featured && <span className="admin-item-destaque">✨ Destaque</span>}
-                  </div>
+                    <div className="admin-item-info">
+                      <span className="admin-item-cat">{p.category}</span>
+                      <strong>{p.name}</strong>
+                      {p.images?.length > 1 && (
+                        <span className="admin-item-fotos">
+                          📷 {p.images.length} fotos
+                        </span>
+                      )}
+                      {p.featured && <span className="admin-item-destaque">✨ Destaque</span>}
+                    </div>
 
-                  <div className="admin-item-acoes">
-                    <button
-                      className="admin-btn-editar"
-                      onClick={() => handleEditar(p)}
-                      title="Editar"
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      className="admin-btn-excluir"
-                      onClick={() => handleExcluir(p.id, p.name)}
-                      title="Excluir"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </article>
-              ))}
+                    <div className="admin-item-acoes">
+                      <button
+                        className="admin-btn-editar"
+                        onClick={() => handleEditar(p)}
+                        title="Editar"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="admin-btn-excluir"
+                        onClick={() => handleExcluir(p.id, p.name)}
+                        title="Excluir"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>

@@ -3,6 +3,10 @@ import { abrirWhatsApp, mensagemProduto } from '../../utils/whatsapp';
 import './ProductCard.css';
 
 export function ProductCard({ product }) {
+  // Pega a primeira imagem (compatível com antigo e novo)
+  const capa = product.images?.[0] || product.image;
+  const totalFotos = product.images?.length || 1;
+
   function handleWhatsApp(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -15,7 +19,10 @@ export function ProductCard({ product }) {
         {product.featured && <span className="badge">✨ Destaque</span>}
 
         <div className="product-image">
-          <img src={product.image} alt={product.name} />
+          <img src={capa} alt={product.name} />
+          {totalFotos > 1 && (
+            <span className="fotos-badge">📷 {totalFotos}</span>
+          )}
         </div>
 
         <div className="product-info">
