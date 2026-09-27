@@ -43,7 +43,7 @@ export function Home() {
 
       <section className="home-hero">
         <div className="home-hero-content">
-          <span className="home-hero-tag">🌸 Papelaria com amor</span>
+          
           <h1>
             Bem-vinda ao <br />
             <span className="home-hero-destaque">Cantinho da Lanna</span>
