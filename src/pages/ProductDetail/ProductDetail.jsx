@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Header } from '../../components/Header/Header';
 import { Footer } from '../../components/Footer/Footer';
@@ -12,7 +12,6 @@ export function ProductDetail() {
   const { products } = useProducts();
   const [quantity, setQuantity] = useState(1);
   const [imagemAtual, setImagemAtual] = useState(0);
-  const galeriaRef = useRef(null);
 
   const product = products.find((p) => p.id === id);
 
@@ -54,11 +53,9 @@ export function ProductDetail() {
     abrirWhatsApp(mensagemProduto(product, quantity));
   }
 
+  // 🎯 Simplesmente troca a imagem, SEM rolar a página
   function handleTrocarImagem(i) {
     setImagemAtual(i);
-    if (galeriaRef.current) {
-      galeriaRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
   }
 
   return (
@@ -77,7 +74,7 @@ export function ProductDetail() {
         </nav>
 
         <section className="detail-main">
-          <div className="detail-gallery" ref={galeriaRef}>
+          <div className="detail-gallery">
             <div className="detail-gallery-main">
               {product.featured && <span className="detail-badge-destaque">✨ Destaque</span>}
               <img src={fotos[imagemAtual]} alt={product.name} />
@@ -90,6 +87,7 @@ export function ProductDetail() {
                     key={i}
                     className={`detail-thumb ${i === imagemAtual ? 'active' : ''}`}
                     onClick={() => handleTrocarImagem(i)}
+                    type="button"
                   >
                     <img src={foto} alt={`Foto ${i + 1}`} />
                   </button>
