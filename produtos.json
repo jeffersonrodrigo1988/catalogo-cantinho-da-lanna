@@ -106,6 +106,20 @@
       "stock": 50,
       "featured": true,
       "id": "1790527295626"
+    },
+    {
+      "name": "Topo de Bolo Letra decorada Com Flores",
+      "description": "Surpreenda com uma decoração sofisticada e cheia de charme!\nFeito com camadas de papel Color Plus 180g, lamicote dourado e recorte manual, trazendo um toque artesanal e delicado.\n\n📌 Perfeito para qualquer ocasião especial!\n🔖 Detalhes que fazem toda a diferença na sua festa",
+      "images": [
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527511-1790527511.jpg",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527513-1790527513.jpg",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527514-1790527514.jpg"
+      ],
+      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527511-1790527511.jpg",
+      "category": "Topos de Bolo",
+      "stock": 1,
+      "featured": true,
+      "id": "1790527539112"
     }
   ]
 }
