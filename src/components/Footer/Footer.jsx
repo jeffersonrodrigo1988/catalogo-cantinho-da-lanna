@@ -1,16 +1,21 @@
 import { Link } from 'react-router-dom';
 import { abrirWhatsApp } from '../../utils/whatsapp';
 import { MENSAGEM_SAUDACAO, WHATSAPP_NUMBER, LOJA_NOME } from '../../config';
+import { useProducts } from '../../context/ProductsContext';
 import logo from '../../assets/cantinhodalanna.png';
 import './Footer.css';
 
 export function Footer() {
   const ano = new Date().getFullYear();
+  const { categories } = useProducts();
 
   const numeroFormatado = WHATSAPP_NUMBER.replace(
     /^(\d{2})(\d{2})(\d{5})(\d{4})$/,
     '+$1 ($2) $3-$4'
   );
+
+  // Pega as categorias (sem "Todos") e limita a 6
+  const categoriasReais = categories.filter((c) => c !== 'Todos').slice(0, 6);
 
   return (
     <footer className="footer">
@@ -75,12 +80,17 @@ export function Footer() {
 
         <div className="footer-col">
           <h4>Categorias</h4>
-          <ul className="footer-links">
-            <li><Link to="/produtos">Cadernos</Link></li>
-            <li><Link to="/produtos">Canetas</Link></li>
-            <li><Link to="/produtos">Lápis e Cores</Link></li>
-            <li><Link to="/produtos">Presentes</Link></li>
-          </ul>
+          {categoriasReais.length === 0 ? (
+            <p className="footer-sem-cat">Em breve novidades 💕</p>
+          ) : (
+            <ul className="footer-links">
+              {categoriasReais.map((cat) => (
+                <li key={cat}>
+                  <Link to="/produtos">{cat}</Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="footer-col">

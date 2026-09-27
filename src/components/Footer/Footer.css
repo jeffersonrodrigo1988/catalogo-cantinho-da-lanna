@@ -150,6 +150,12 @@
   width: 10px;
 }
 
+.footer-sem-cat {
+  font-size: 0.9rem;
+  color: #c8b6ae;
+  font-style: italic;
+}
+
 .footer-contato {
   list-style: none;
   display: flex;
