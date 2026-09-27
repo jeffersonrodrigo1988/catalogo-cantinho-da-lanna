@@ -37,7 +37,6 @@ async fn salvar_produtos_github(produtos_json: String) -> Result<String, String>
         GITHUB_USER, GITHUB_REPO, GITHUB_FILE_PATH
     );
 
-    // Pega o SHA do arquivo atual (se existir)
     let mut sha_atual: Option<String> = None;
     let res_get = client
         .get(&url)
@@ -54,7 +53,6 @@ async fn salvar_produtos_github(produtos_json: String) -> Result<String, String>
         }
     }
 
-    // Codifica o JSON em Base64
     use base64::{engine::general_purpose, Engine as _};
     let content_b64 = general_purpose::STANDARD.encode(produtos_json.as_bytes());
 
@@ -132,7 +130,6 @@ async fn carregar_produtos_github() -> Result<String, String> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    // Carrega variáveis do arquivo .env
     let _ = dotenvy::dotenv();
 
     tauri::Builder::default()

@@ -89,11 +89,6 @@
   box-shadow: 0 8px 20px rgba(224, 122, 159, 0.4);
 }
 
-.menu-link-admin.active {
-  background: var(--pink-dark);
-  color: var(--white);
-}
-
 .btn-whatsapp-header {
   display: inline-flex;
   align-items: center;
@@ -115,19 +110,181 @@
   box-shadow: 0 10px 24px rgba(37, 211, 102, 0.35);
 }
 
-.btn-whatsapp-header svg {
+/* ============ HAMBURGUER ============ */
+.hamburger {
+  display: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--pink-soft);
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  cursor: pointer;
+  transition: all var(--transition);
   flex-shrink: 0;
 }
 
+.hamburger span {
+  display: block;
+  width: 22px;
+  height: 2.5px;
+  background: var(--pink-dark);
+  border-radius: 2px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hamburger:hover {
+  background: var(--pink);
+}
+
+.hamburger:hover span {
+  background: var(--white);
+}
+
+.hamburger.active {
+  background: var(--pink-dark);
+}
+
+.hamburger.active span {
+  background: var(--white);
+}
+
+.hamburger.active span:nth-child(1) {
+  transform: translateY(7.5px) rotate(45deg);
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamburger.active span:nth-child(3) {
+  transform: translateY(-7.5px) rotate(-45deg);
+}
+
+/* ============ MENU MOBILE ============ */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(340px, 85vw);
+  background: var(--white);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.15);
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 999;
+  padding: 6rem 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  overflow-y: auto;
+}
+
+.mobile-menu.open {
+  transform: translateX(0);
+}
+
+.mobile-menu-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mobile-menu-link {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1rem 1.15rem;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--brown);
+  transition: all var(--transition);
+}
+
+.mobile-menu-link span {
+  font-size: 1.35rem;
+}
+
+.mobile-menu-link:hover {
+  background: var(--pink-soft);
+  color: var(--pink-dark);
+  transform: translateX(4px);
+}
+
+.mobile-menu-link.active {
+  background: var(--pink-soft);
+  color: var(--pink-dark);
+  font-weight: 700;
+}
+
+.mobile-menu-link-admin {
+  background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+  color: var(--white) !important;
+  margin-top: 0.5rem;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(224, 122, 159, 0.3);
+}
+
+.mobile-menu-link-admin:hover {
+  color: var(--white) !important;
+}
+
+.mobile-menu-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: var(--zap);
+  color: var(--white);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 1rem;
+  transition: all var(--transition);
+  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35);
+  margin-top: auto;
+}
+
+.mobile-menu-whatsapp:hover {
+  background: var(--zap-dark);
+  transform: translateY(-2px);
+}
+
+.mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 998;
+  animation: fadeIn 0.2s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ============ RESPONSIVO ============ */
 @media (max-width: 1100px) {
   .menu {
     display: none;
+  }
+
+  .hamburger {
+    display: flex;
   }
 }
 
 @media (max-width: 600px) {
   .header {
     padding: 0.75rem 1.25rem;
+    gap: 0.75rem;
   }
 
   .logo-img {
@@ -149,5 +306,10 @@
 
   .btn-whatsapp-header {
     padding: 0.6rem;
+  }
+
+  .hamburger {
+    width: 42px;
+    height: 42px;
   }
 }
