@@ -4,6 +4,9 @@ import { Footer } from '../../components/Footer/Footer';
 import { MENSAGEM_SAUDACAO, WHATSAPP_NUMBER } from '../../config';
 import './Contato.css';
 
+const EMAIL = 'cantinhodalannaofficial@gmail.com';
+const LINK_GMAIL = `https://mail.google.com/mail/?view=cm&fs=1&to=${EMAIL}&su=Contato%20-%20Cantinho%20da%20Lanna`;
+
 export function Contato() {
   const [nome, setNome] = useState('');
   const [mensagem, setMensagem] = useState('');
@@ -92,10 +95,12 @@ export function Contato() {
               </svg>
             </div>
             <h3>E-mail</h3>
-            <p>cantinhodalannaofficial@gmail.com</p>
+            <p>{EMAIL}</p>
             <a
               className="contato-card-btn"
-              href="mailto:cantinhodalannaoficial@gmail.com"
+              href={LINK_GMAIL}
+              target="_blank"
+              rel="noopener noreferrer"
             >
               Enviar e-mail
             </a>
