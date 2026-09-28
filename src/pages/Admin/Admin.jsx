@@ -5,6 +5,7 @@ import { Header } from '../../components/Header/Header';
 import { Calculadora } from '../../components/Calculadora/Calculadora';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
 import { useProducts } from '../../context/ProductsContext';
+import { useDialog } from '../../context/DialogContext';
 import { ADMIN_PASSWORD } from '../../config';
 import { isTauri } from '../../utils/tauri';
 import './Admin.css';
@@ -37,6 +38,8 @@ const ORCAMENTO_VAZIO = {
 const STORAGE_KEY = 'cantinho-admin-logado';
 
 export function Admin() {
+  const { confirmar, notificar } = useDialog();
+
   const [logado, setLogado] = useState(() => {
     if (typeof window === 'undefined') return false;
     return sessionStorage.getItem(STORAGE_KEY) === 'true';
@@ -63,13 +66,11 @@ export function Admin() {
 
   const [form, setForm] = useState(FORM_VAZIO);
   const [editandoId, setEditandoId] = useState(null);
-  const [mensagem, setMensagem] = useState('');
   const [enviandoImagem, setEnviandoImagem] = useState(false);
   const [novaCategoria, setNovaCategoria] = useState('');
   const [valorHoraInput, setValorHoraInput] = useState('25');
   const [mostrarPreview, setMostrarPreview] = useState(true);
 
-  // Calculadora de orçamento
   const [orcamento, setOrcamento] = useState(ORCAMENTO_VAZIO);
 
   useEffect(() => {
@@ -123,19 +124,12 @@ export function Admin() {
     const precoFinal = manual > 0 ? manual : precoCalculado;
     const lucro = precoFinal - custoTotal;
 
-    return {
-      custoMaoDeObra,
-      custoTotal,
-      precoCalculado,
-      precoFinal,
-      lucro,
-    };
+    return { custoMaoDeObra, custoTotal, precoCalculado, precoFinal, lucro };
   }
 
   const calcProduto = calcular(form);
   const calcOrcamento = calcular(orcamento);
 
-  // === PREVIEW DO PRODUTO ===
   const produtoPreview = {
     id: 'preview',
     name: form.name || 'Nome do produto',
@@ -153,15 +147,25 @@ export function Admin() {
       setLogado(true);
       setErroSenha('');
       setSenha('');
+      notificar('Bem-vinda de volta! 💜', 'sucesso');
     } else {
       setErroSenha('Senha incorreta 😢');
+      notificar('Senha incorreta', 'erro');
     }
   }
 
-  function handleLogout() {
-    if (confirm('Sair do painel admin?')) {
+  async function handleLogout() {
+    const ok = await confirmar({
+      titulo: 'Sair do painel?',
+      mensagem: 'Você vai precisar digitar a senha novamente pra voltar.',
+      textoConfirmar: 'Sair',
+      textoCancelar: 'Ficar',
+      icone: '🚪',
+    });
+    if (ok) {
       setLogado(false);
       setSenha('');
+      notificar('Você saiu do painel', 'info');
     }
   }
 
@@ -188,14 +192,14 @@ export function Admin() {
     if (arquivos.length === 0) return;
 
     setEnviandoImagem(true);
-    setMensagem('📤 Enviando imagens...');
+    notificar('Enviando imagens...', 'info');
 
     try {
       const novasUrls = [];
 
       for (const arquivo of arquivos) {
         if (arquivo.size > 3 * 1024 * 1024) {
-          alert(`Imagem "${arquivo.name}" é muito grande (máx 3MB). Pulando.`);
+          notificar(`Imagem "${arquivo.name}" é muito grande (máx 3MB)`, 'aviso');
           continue;
         }
 
@@ -212,11 +216,10 @@ export function Admin() {
         images: [...prev.images, ...novasUrls],
       }));
 
-      setMensagem(`✅ ${novasUrls.length} imagem(ns) enviada(s)!`);
-      setTimeout(() => setMensagem(''), 2500);
+      notificar(`${novasUrls.length} imagem(ns) enviada(s)!`, 'sucesso');
     } catch (err) {
       console.error('Erro no upload:', err);
-      setMensagem('❌ Erro ao enviar imagem: ' + err);
+      notificar('Erro ao enviar imagem: ' + err, 'erro');
     } finally {
       setEnviandoImagem(false);
       e.target.value = '';
@@ -234,12 +237,12 @@ export function Admin() {
     e.preventDefault();
 
     if (!form.name || !form.category) {
-      setMensagem('⚠️ Preencha nome e categoria');
+      notificar('Preencha nome e categoria', 'aviso');
       return;
     }
 
     if (form.images.length === 0) {
-      setMensagem('⚠️ Adicione pelo menos 1 imagem');
+      notificar('Adicione pelo menos 1 imagem', 'aviso');
       return;
     }
 
@@ -262,15 +265,14 @@ export function Admin() {
 
     if (editandoId) {
       updateProduct(editandoId, produtoFinal);
-      setMensagem('✅ Produto atualizado!');
+      notificar('Produto atualizado!', 'sucesso');
     } else {
       addProduct(produtoFinal);
-      setMensagem('✅ Produto adicionado!');
+      notificar('Produto adicionado!', 'sucesso');
     }
 
     setForm(FORM_VAZIO);
     setEditandoId(null);
-    setTimeout(() => setMensagem(''), 2500);
   }
 
   function handleEditarProduto(produto) {
@@ -290,6 +292,7 @@ export function Admin() {
     setEditandoId(produto.id);
     setAbaAtiva('produtos');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    notificar('Editando: ' + produto.name, 'info');
   }
 
   function handleCancelarProduto() {
@@ -297,11 +300,17 @@ export function Admin() {
     setEditandoId(null);
   }
 
-  function handleExcluirProduto(id, nome) {
-    if (confirm(`Excluir "${nome}"?`)) {
+  async function handleExcluirProduto(id, nome) {
+    const ok = await confirmar({
+      titulo: 'Excluir produto?',
+      mensagem: `Tem certeza que quer excluir "${nome}"? Essa ação não pode ser desfeita.`,
+      textoConfirmar: 'Excluir',
+      textoCancelar: 'Cancelar',
+      perigo: true,
+    });
+    if (ok) {
       removeProduct(id);
-      setMensagem('🗑️ Produto excluído');
-      setTimeout(() => setMensagem(''), 2500);
+      notificar('Produto excluído', 'sucesso');
     }
   }
 
@@ -310,21 +319,26 @@ export function Admin() {
     e.preventDefault();
     if (!novaCategoria.trim()) return;
     addCategory(novaCategoria);
+    notificar('Categoria adicionada!', 'sucesso');
     setNovaCategoria('');
-    setMensagem('✅ Categoria adicionada!');
-    setTimeout(() => setMensagem(''), 2000);
   }
 
-  function handleRemoveCategoria(nome) {
+  async function handleRemoveCategoria(nome) {
     const usada = products.some((p) => p.category === nome);
     if (usada) {
-      alert(`Não é possível excluir "${nome}" — tem produtos usando essa categoria.`);
+      notificar(`Não é possível excluir "${nome}" — tem produtos usando`, 'aviso');
       return;
     }
-    if (confirm(`Excluir categoria "${nome}"?`)) {
+    const ok = await confirmar({
+      titulo: 'Excluir categoria?',
+      mensagem: `Quer mesmo excluir a categoria "${nome}"?`,
+      textoConfirmar: 'Excluir',
+      textoCancelar: 'Cancelar',
+      perigo: true,
+    });
+    if (ok) {
       removeCategory(nome);
-      setMensagem('🗑️ Categoria excluída');
-      setTimeout(() => setMensagem(''), 2000);
+      notificar('Categoria excluída', 'sucesso');
     }
   }
 
@@ -332,12 +346,11 @@ export function Admin() {
   function handleSalvarValorHora() {
     const valor = parseFloat(valorHoraInput);
     if (!valor || valor <= 0) {
-      setMensagem('⚠️ Digite um valor válido');
+      notificar('Digite um valor válido', 'aviso');
       return;
     }
     atualizarPricing({ valorHora: valor });
-    setMensagem('✅ Valor da hora atualizado!');
-    setTimeout(() => setMensagem(''), 2000);
+    notificar('Valor da hora atualizado!', 'sucesso');
   }
 
   // === ORÇAMENTOS ===
@@ -349,7 +362,7 @@ export function Admin() {
   function handleSalvarOrcamento(e) {
     e.preventDefault();
     if (!orcamento.nome.trim()) {
-      setMensagem('⚠️ Dê um nome pro orçamento');
+      notificar('Dê um nome pro orçamento', 'aviso');
       return;
     }
 
@@ -369,15 +382,20 @@ export function Admin() {
 
     addOrcamento(novo);
     setOrcamento(ORCAMENTO_VAZIO);
-    setMensagem('✅ Orçamento salvo!');
-    setTimeout(() => setMensagem(''), 2500);
+    notificar('Orçamento salvo!', 'sucesso');
   }
 
-  function handleExcluirOrcamento(id, nome) {
-    if (confirm(`Excluir orçamento "${nome}"?`)) {
+  async function handleExcluirOrcamento(id, nome) {
+    const ok = await confirmar({
+      titulo: 'Excluir orçamento?',
+      mensagem: `Quer mesmo excluir "${nome}" do histórico?`,
+      textoConfirmar: 'Excluir',
+      textoCancelar: 'Cancelar',
+      perigo: true,
+    });
+    if (ok) {
       removeOrcamento(id);
-      setMensagem('🗑️ Orçamento excluído');
-      setTimeout(() => setMensagem(''), 2000);
+      notificar('Orçamento excluído', 'sucesso');
     }
   }
 
@@ -445,8 +463,6 @@ export function Admin() {
             </button>
           </div>
         </div>
-
-        {mensagem && <div className="admin-mensagem">{mensagem}</div>}
 
         {/* === ABAS === */}
         <div className="admin-tabs">
@@ -564,7 +580,9 @@ export function Admin() {
                             <div key={i} className="admin-image-item">
                               <img src={url} alt={`Foto ${i + 1}`} />
                               {i === 0 && (
-                                <span className="admin-image-principal">Principal</span>
+                                <span className="admin-image-principal">
+                                  Principal
+                                </span>
                               )}
                               <button
                                 type="button"
@@ -602,7 +620,6 @@ export function Admin() {
                     </label>
                   </div>
 
-                  {/* Precificação do produto */}
                   <div className="admin-pricing-section">
                     <h3>💵 Precificação (só você vê)</h3>
                     <p className="admin-pricing-subtitle">
@@ -671,14 +688,18 @@ export function Admin() {
                       </label>
                     </div>
 
-                    {(form.custoMateriais || form.horasTrabalho || form.custosExtras) && (
+                    {(form.custoMateriais ||
+                      form.horasTrabalho ||
+                      form.custosExtras) && (
                       <div className="admin-pricing-preview">
                         <div className="admin-pricing-preview-row">
                           <span>
                             Mão de obra ({form.horasTrabalho || 0}h × R${' '}
                             {pricing?.valorHora || 25})
                           </span>
-                          <strong>R$ {calcProduto.custoMaoDeObra.toFixed(2)}</strong>
+                          <strong>
+                            R$ {calcProduto.custoMaoDeObra.toFixed(2)}
+                          </strong>
                         </div>
                         <div className="admin-pricing-preview-row">
                           <span>Custo total</span>
@@ -718,7 +739,6 @@ export function Admin() {
                 </form>
               </section>
 
-              {/* Preview do produto */}
               {mostrarPreview && (
                 <aside className="admin-preview-panel">
                   <div className="admin-preview-header">
@@ -776,7 +796,9 @@ export function Admin() {
                             </span>
                           )}
                           {p.featured && (
-                            <span className="admin-item-destaque">✨ Destaque</span>
+                            <span className="admin-item-destaque">
+                              ✨ Destaque
+                            </span>
                           )}
                         </div>
 
@@ -1020,7 +1042,9 @@ export function Admin() {
                         Mão de obra ({orcamento.horasTrabalho || 0}h × R${' '}
                         {pricing?.valorHora || 25})
                       </span>
-                      <strong>R$ {calcOrcamento.custoMaoDeObra.toFixed(2)}</strong>
+                      <strong>
+                        R$ {calcOrcamento.custoMaoDeObra.toFixed(2)}
+                      </strong>
                     </div>
                     <div className="admin-pricing-preview-row">
                       <span>Custo total</span>
@@ -1064,7 +1088,10 @@ export function Admin() {
               ) : (
                 <div className="admin-lista">
                   {orcamentos.map((o) => (
-                    <article key={o.id} className="admin-item admin-orcamento-item">
+                    <article
+                      key={o.id}
+                      className="admin-item admin-orcamento-item"
+                    >
                       <div className="admin-orcamento-icon">💰</div>
 
                       <div className="admin-item-info">
