@@ -1044,3 +1044,193 @@
     margin: 0 auto;
   }
 }
+/* ============ EDITANDO ORÇAMENTO ============ */
+.admin-editing-badge {
+  background: linear-gradient(135deg, #8b6bb8, #b89dd9);
+  color: var(--white);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(139, 107, 184, 0.3);
+  animation: admin-editing-pulse 2s infinite;
+}
+
+@keyframes admin-editing-pulse {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(139, 107, 184, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(139, 107, 184, 0.6);
+  }
+}
+
+.admin-orcamento-editando {
+  border: 2px solid var(--pink-dark) !important;
+  box-shadow: 0 8px 24px rgba(139, 107, 184, 0.25) !important;
+  background: linear-gradient(135deg, #f8f4ff 0%, #fff 100%) !important;
+}
+/* ============ MODAL DE EDIÇÃO DE ORÇAMENTO ============ */
+.orcamento-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(61, 43, 82, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: orcamento-overlay-in 0.25s ease-out;
+  overflow-y: auto;
+}
+
+@keyframes orcamento-overlay-in {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+  }
+}
+
+.orcamento-modal {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  box-shadow: 0 32px 80px rgba(61, 43, 82, 0.4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: orcamento-modal-in 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(201, 165, 232, 0.3);
+}
+
+@keyframes orcamento-modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.orcamento-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.75rem 2rem 1.25rem;
+  border-bottom: 1px solid rgba(201, 165, 232, 0.2);
+  background: linear-gradient(135deg, #f8f4ff 0%, #fff 100%);
+}
+
+.orcamento-modal-head h2 {
+  font-size: 1.35rem;
+  color: var(--pink-dark);
+  margin: 0.5rem 0 0.25rem;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+}
+
+.orcamento-modal-badge {
+  background: linear-gradient(135deg, #8b6bb8, #b89dd9);
+  color: var(--white);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(139, 107, 184, 0.3);
+  display: inline-block;
+}
+
+.orcamento-modal-cliente {
+  font-size: 0.85rem;
+  color: var(--gray);
+  margin: 0;
+}
+
+.orcamento-modal-close {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--gray);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid rgba(201, 165, 232, 0.25);
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.orcamento-modal-close:hover {
+  background: #ff5c5c;
+  color: var(--white);
+  border-color: #ff5c5c;
+  transform: rotate(90deg);
+}
+
+.orcamento-modal-body {
+  padding: 1.75rem 2rem 2rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.orcamento-modal-body .admin-form {
+  gap: 1.5rem;
+}
+
+.orcamento-modal-body .admin-form-actions {
+  margin-top: 0.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed rgba(201, 165, 232, 0.3);
+}
+
+@media (max-width: 700px) {
+  .orcamento-modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .orcamento-modal {
+    max-height: 92vh;
+    max-width: 100%;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    animation: orcamento-modal-in-mobile 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes orcamento-modal-in-mobile {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .orcamento-modal-head {
+    padding: 1.25rem 1.25rem 1rem;
+  }
+
+  .orcamento-modal-body {
+    padding: 1.25rem;
+  }
+
+  .orcamento-modal-head h2 {
+    font-size: 1.15rem;
+  }
+}

@@ -61,6 +61,7 @@ export function Admin() {
     removeCategory,
     atualizarPricing,
     addOrcamento,
+    updateOrcamento,
     removeOrcamento,
   } = useProducts();
 
@@ -72,6 +73,8 @@ export function Admin() {
   const [mostrarPreview, setMostrarPreview] = useState(true);
 
   const [orcamento, setOrcamento] = useState(ORCAMENTO_VAZIO);
+  const [editandoOrcamentoId, setEditandoOrcamentoId] = useState(null);
+  const [modalOrcamentoAberto, setModalOrcamentoAberto] = useState(false);
 
   useEffect(() => {
     if (pricing?.valorHora) {
@@ -86,6 +89,29 @@ export function Admin() {
       sessionStorage.removeItem(STORAGE_KEY);
     }
   }, [logado]);
+
+  // Bloqueia scroll do body quando modal aberto
+  useEffect(() => {
+    if (modalOrcamentoAberto) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [modalOrcamentoAberto]);
+
+  // Fecha modal com ESC
+  useEffect(() => {
+    function handleEsc(e) {
+      if (e.key === 'Escape' && modalOrcamentoAberto) {
+        fecharModalOrcamento();
+      }
+    }
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [modalOrcamentoAberto]);
 
   if (!isTauri()) {
     return (
@@ -366,7 +392,7 @@ export function Admin() {
       return;
     }
 
-    const novo = {
+    const dados = {
       nome: orcamento.nome.trim(),
       cliente: orcamento.cliente.trim(),
       custoMateriais: parseFloat(orcamento.custoMateriais) || 0,
@@ -380,9 +406,36 @@ export function Admin() {
       observacoes: orcamento.observacoes.trim(),
     };
 
-    addOrcamento(novo);
+    if (editandoOrcamentoId) {
+      updateOrcamento(editandoOrcamentoId, dados);
+      notificar('Orçamento atualizado!', 'sucesso');
+      fecharModalOrcamento();
+    } else {
+      addOrcamento(dados);
+      notificar('Orçamento salvo!', 'sucesso');
+      setOrcamento(ORCAMENTO_VAZIO);
+    }
+  }
+
+  function handleEditarOrcamento(o) {
+    setOrcamento({
+      nome: o.nome || '',
+      cliente: o.cliente || '',
+      custoMateriais: String(o.custoMateriais || ''),
+      horasTrabalho: String(o.horasTrabalho || ''),
+      custosExtras: String(o.custosExtras || ''),
+      margemLucro: String(o.margemLucro ?? 100),
+      precoManual: o.precoManual ? String(o.precoManual) : '',
+      observacoes: o.observacoes || '',
+    });
+    setEditandoOrcamentoId(o.id);
+    setModalOrcamentoAberto(true);
+  }
+
+  function fecharModalOrcamento() {
+    setModalOrcamentoAberto(false);
+    setEditandoOrcamentoId(null);
     setOrcamento(ORCAMENTO_VAZIO);
-    notificar('Orçamento salvo!', 'sucesso');
   }
 
   async function handleExcluirOrcamento(id, nome) {
@@ -464,7 +517,6 @@ export function Admin() {
           </div>
         </div>
 
-        {/* === ABAS === */}
         <div className="admin-tabs">
           <button
             className={`admin-tab ${abaAtiva === 'produtos' ? 'active' : ''}`}
@@ -491,7 +543,6 @@ export function Admin() {
           </button>
         </div>
 
-        {/* ================= ABA PRODUTOS ================= */}
         {abaAtiva === 'produtos' && (
           <>
             <div className="admin-form-with-preview">
@@ -827,7 +878,6 @@ export function Admin() {
           </>
         )}
 
-        {/* ================= ABA CATEGORIAS ================= */}
         {abaAtiva === 'categorias' && (
           <section className="admin-form-section">
             <h2>📂 Gerenciar categorias</h2>
@@ -881,7 +931,6 @@ export function Admin() {
           </section>
         )}
 
-        {/* ================= ABA PRECIFICAÇÃO ================= */}
         {abaAtiva === 'precificacao' && (
           <>
             <section className="admin-duo">
@@ -1088,10 +1137,7 @@ export function Admin() {
               ) : (
                 <div className="admin-lista">
                   {orcamentos.map((o) => (
-                    <article
-                      key={o.id}
-                      className="admin-item admin-orcamento-item"
-                    >
+                    <article key={o.id} className="admin-item admin-orcamento-item">
                       <div className="admin-orcamento-icon">💰</div>
 
                       <div className="admin-item-info">
@@ -1114,10 +1160,20 @@ export function Admin() {
                         )}
                         <span className="admin-orcamento-data">
                           🕐 {formatarData(o.criadoEm)}
+                          {o.atualizadoEm && (
+                            <> · editado {formatarData(o.atualizadoEm)}</>
+                          )}
                         </span>
                       </div>
 
                       <div className="admin-item-acoes">
+                        <button
+                          className="admin-btn-editar"
+                          onClick={() => handleEditarOrcamento(o)}
+                          title="Editar"
+                        >
+                          ✏️
+                        </button>
                         <button
                           className="admin-btn-excluir"
                           onClick={() => handleExcluirOrcamento(o.id, o.nome)}
@@ -1134,6 +1190,175 @@ export function Admin() {
           </>
         )}
       </main>
+
+      {/* ================= MODAL DE EDIÇÃO DE ORÇAMENTO ================= */}
+      {modalOrcamentoAberto && (
+        <div className="orcamento-modal-overlay" onClick={fecharModalOrcamento}>
+          <div
+            className="orcamento-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="orcamento-modal-head">
+              <div>
+                <span className="orcamento-modal-badge">✏️ Editando</span>
+                <h2>{orcamento.nome || 'Editar orçamento'}</h2>
+                {orcamento.cliente && (
+                  <p className="orcamento-modal-cliente">
+                    👤 {orcamento.cliente}
+                  </p>
+                )}
+              </div>
+              <button
+                className="orcamento-modal-close"
+                onClick={fecharModalOrcamento}
+                title="Fechar"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="orcamento-modal-body">
+              <form className="admin-form" onSubmit={handleSalvarOrcamento}>
+                <div className="admin-grid">
+                  <label className="admin-field">
+                    <span>Nome do item/projeto *</span>
+                    <input
+                      type="text"
+                      name="nome"
+                      value={orcamento.nome}
+                      onChange={handleChangeOrcamento}
+                      placeholder="Ex: Topo de bolo personalizado"
+                    />
+                  </label>
+
+                  <label className="admin-field">
+                    <span>Cliente (opcional)</span>
+                    <input
+                      type="text"
+                      name="cliente"
+                      value={orcamento.cliente}
+                      onChange={handleChangeOrcamento}
+                      placeholder="Nome da cliente"
+                    />
+                  </label>
+
+                  <label className="admin-field">
+                    <span>Custo dos materiais (R$)</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      name="custoMateriais"
+                      value={orcamento.custoMateriais}
+                      onChange={handleChangeOrcamento}
+                      placeholder="Ex: 15.50"
+                    />
+                  </label>
+
+                  <label className="admin-field">
+                    <span>Horas de trabalho</span>
+                    <input
+                      type="number"
+                      step="0.1"
+                      name="horasTrabalho"
+                      value={orcamento.horasTrabalho}
+                      onChange={handleChangeOrcamento}
+                      placeholder="Ex: 2"
+                    />
+                  </label>
+
+                  <label className="admin-field">
+                    <span>Custos extras (R$)</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      name="custosExtras"
+                      value={orcamento.custosExtras}
+                      onChange={handleChangeOrcamento}
+                      placeholder="Embalagem, frete..."
+                    />
+                  </label>
+
+                  <label className="admin-field">
+                    <span>Margem de lucro (%)</span>
+                    <input
+                      type="number"
+                      step="1"
+                      name="margemLucro"
+                      value={orcamento.margemLucro}
+                      onChange={handleChangeOrcamento}
+                      placeholder="Ex: 100"
+                    />
+                  </label>
+
+                  <label className="admin-field">
+                    <span>Preço fixo (opcional)</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      name="precoManual"
+                      value={orcamento.precoManual}
+                      onChange={handleChangeOrcamento}
+                      placeholder="Deixe vazio pro calculado"
+                    />
+                  </label>
+
+                  <label className="admin-field admin-field-wide">
+                    <span>Observações</span>
+                    <textarea
+                      rows="2"
+                      name="observacoes"
+                      value={orcamento.observacoes}
+                      onChange={handleChangeOrcamento}
+                      placeholder="Detalhes do pedido, prazo, etc..."
+                    />
+                  </label>
+                </div>
+
+                {(orcamento.custoMateriais ||
+                  orcamento.horasTrabalho ||
+                  orcamento.custosExtras) && (
+                  <div className="admin-pricing-preview">
+                    <div className="admin-pricing-preview-row">
+                      <span>
+                        Mão de obra ({orcamento.horasTrabalho || 0}h × R${' '}
+                        {pricing?.valorHora || 25})
+                      </span>
+                      <strong>
+                        R$ {calcOrcamento.custoMaoDeObra.toFixed(2)}
+                      </strong>
+                    </div>
+                    <div className="admin-pricing-preview-row">
+                      <span>Custo total</span>
+                      <strong>R$ {calcOrcamento.custoTotal.toFixed(2)}</strong>
+                    </div>
+                    <div className="admin-pricing-preview-row">
+                      <span>Lucro ({orcamento.margemLucro || 0}%)</span>
+                      <strong>R$ {calcOrcamento.lucro.toFixed(2)}</strong>
+                    </div>
+                    <div className="admin-pricing-preview-total">
+                      <span>💰 Preço final</span>
+                      <strong>R$ {calcOrcamento.precoFinal.toFixed(2)}</strong>
+                    </div>
+                  </div>
+                )}
+
+                <div className="admin-form-actions">
+                  <button type="submit" className="admin-btn-primary">
+                    💾 Salvar alterações
+                  </button>
+                  <button
+                    type="button"
+                    className="admin-btn-secundario"
+                    onClick={fecharModalOrcamento}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

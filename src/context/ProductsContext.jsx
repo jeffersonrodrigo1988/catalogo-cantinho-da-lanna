@@ -126,6 +126,21 @@ export function ProductsProvider({ children }) {
     return novo;
   }
 
+  function updateOrcamento(id, orcamento) {
+    const lista = orcamentos.map((o) =>
+      o.id === id
+        ? {
+            ...o,
+            ...orcamento,
+            id,
+            atualizadoEm: new Date().toISOString(),
+          }
+        : o
+    );
+    setOrcamentos(lista);
+    sincronizar(products, customCategories, pricing, lista);
+  }
+
   function removeOrcamento(id) {
     const lista = orcamentos.filter((o) => o.id !== id);
     setOrcamentos(lista);
@@ -152,6 +167,7 @@ export function ProductsProvider({ children }) {
         removeCategory,
         atualizarPricing,
         addOrcamento,
+        updateOrcamento,
         removeOrcamento,
       }}
     >
