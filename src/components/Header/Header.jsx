@@ -33,7 +33,7 @@ export function Header() {
         <img src={logo} alt="Cantinho da Lanna" className="logo-img" />
         <div className="logo-text">
           <h1>Cantinho da Lanna</h1>
-          <p>Papelaria & Presentes</p>
+        
         </div>
       </Link>
 
