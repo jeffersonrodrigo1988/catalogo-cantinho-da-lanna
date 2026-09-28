@@ -32,7 +32,7 @@ export function Header() {
       <Link to="/" className="logo">
         <img src={logo} alt="Cantinho da Lanna" className="logo-img" />
         <div className="logo-text">
-          <h1>Cantinho da Lanna</h1>
+        
         
         </div>
       </Link>
