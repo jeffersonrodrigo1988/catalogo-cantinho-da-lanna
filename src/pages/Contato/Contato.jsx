@@ -95,7 +95,7 @@ export function Contato() {
             <p>cantinhodalannaofficial@gmail.com</p>
             <a
               className="contato-card-btn"
-              href="mailto:cantinhodalannaofficial@gmail.com"
+              href="mailto:cantinhodalannaoficial@gmail.com"
             >
               Enviar e-mail
             </a>

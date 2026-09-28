@@ -55,7 +55,7 @@ export function Footer() {
               </svg>
             </button>
             <a
-              href="mailto:cantinhodalannaofficial@gmail.com"
+              href="mailto:cantinhodalannaoficial@gmail.com"
               className="footer-social-btn"
               aria-label="E-mail"
             >
@@ -106,7 +106,7 @@ export function Footer() {
                 <rect x="2" y="4" width="20" height="16" rx="2"/>
                 <path d="m22 6-10 7L2 6"/>
               </svg>
-              <span>cantinhodalannaofficial@gmail.com</span>
+              <span>cantinhodalannaoficial@gmail.com</span>
             </li>
             <li>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
