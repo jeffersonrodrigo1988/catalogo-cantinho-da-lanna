@@ -116,10 +116,34 @@
         "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527514-1790527514.jpg"
       ],
       "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527511-1790527511.jpg",
-      "category": "Topos de Bolo",
+      "category": "Flores",
       "stock": 1,
       "featured": true,
       "id": "1790527539112"
+    },
+    {
+      "name": "Tag Embalado Com Amor",
+      "description": "Produto do Cantinho da Lanna 💕",
+      "images": [
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790528175-1790528175.jpg"
+      ],
+      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790528175-1790528175.jpg",
+      "category": "Tags",
+      "stock": 20,
+      "featured": false,
+      "id": "1790528182429"
+    },
+    {
+      "name": "Mini Calendário",
+      "description": "Mini Calendário 🤩",
+      "images": [
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790528289-1790528289.jpg"
+      ],
+      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790528289-1790528289.jpg",
+      "category": "Calendários",
+      "stock": 10,
+      "featured": true,
+      "id": "1790528313510"
     }
   ]
 }
