@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { invoke } from '@tauri-apps/api/core';
 import { Header } from '../../components/Header/Header';
@@ -14,31 +14,75 @@ const FORM_VAZIO = {
   category: '',
   stock: '',
   featured: false,
+  custoMateriais: '',
+  horasTrabalho: '',
+  custosExtras: '',
+  margemLucro: '100',
+  precoManual: '',
 };
 
+const ORCAMENTO_VAZIO = {
+  nome: '',
+  cliente: '',
+  custoMateriais: '',
+  horasTrabalho: '',
+  custosExtras: '',
+  margemLucro: '100',
+  precoManual: '',
+  observacoes: '',
+};
+
+const STORAGE_KEY = 'cantinho-admin-logado';
+
 export function Admin() {
-  const [logado, setLogado] = useState(false);
+  const [logado, setLogado] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem(STORAGE_KEY) === 'true';
+  });
+
   const [senha, setSenha] = useState('');
   const [erroSenha, setErroSenha] = useState('');
+  const [abaAtiva, setAbaAtiva] = useState('produtos');
 
   const {
     products,
     categories,
-    customCategories,
+    pricing,
+    orcamentos,
     addProduct,
     updateProduct,
     removeProduct,
     addCategory,
     removeCategory,
+    atualizarPricing,
+    addOrcamento,
+    removeOrcamento,
   } = useProducts();
 
   const [form, setForm] = useState(FORM_VAZIO);
   const [editandoId, setEditandoId] = useState(null);
   const [mensagem, setMensagem] = useState('');
   const [enviandoImagem, setEnviandoImagem] = useState(false);
-
-  // Categorias
   const [novaCategoria, setNovaCategoria] = useState('');
+  const [valorHoraInput, setValorHoraInput] = useState('25');
+
+  // Calculadora de orçamento
+  const [orcamento, setOrcamento] = useState(ORCAMENTO_VAZIO);
+  const [orcamentoEditando, setOrcamentoEditando] = useState(null);
+
+  useEffect(() => {
+    if (pricing?.valorHora) {
+      setValorHoraInput(String(pricing.valorHora));
+    }
+  }, [pricing?.valorHora]);
+
+  useEffect(() => {
+    if (logado) {
+      sessionStorage.setItem(STORAGE_KEY, 'true');
+    } else {
+      sessionStorage.removeItem(STORAGE_KEY);
+    }
+  }, [logado]);
 
   if (!isTauri()) {
     return (
@@ -62,16 +106,53 @@ export function Admin() {
     );
   }
 
+  // === CÁLCULOS ===
+  function calcular(dados) {
+    const custo = parseFloat(dados.custoMateriais) || 0;
+    const horas = parseFloat(dados.horasTrabalho) || 0;
+    const extras = parseFloat(dados.custosExtras) || 0;
+    const margem = parseFloat(dados.margemLucro) || 0;
+    const valorHora = pricing?.valorHora || 25;
+    const manual = parseFloat(dados.precoManual);
+
+    const custoMaoDeObra = horas * valorHora;
+    const custoTotal = custo + custoMaoDeObra + extras;
+    const precoCalculado = custoTotal * (1 + margem / 100);
+    const precoFinal = manual > 0 ? manual : precoCalculado;
+    const lucro = precoFinal - custoTotal;
+
+    return {
+      custoMaoDeObra,
+      custoTotal,
+      precoCalculado,
+      precoFinal,
+      lucro,
+    };
+  }
+
+  const calcProduto = calcular(form);
+  const calcOrcamento = calcular(orcamento);
+
+  // === LOGIN ===
   function handleLogin(e) {
     e.preventDefault();
     if (senha === ADMIN_PASSWORD) {
       setLogado(true);
       setErroSenha('');
+      setSenha('');
     } else {
       setErroSenha('Senha incorreta 😢');
     }
   }
 
+  function handleLogout() {
+    if (confirm('Sair do painel admin?')) {
+      setLogado(false);
+      setSenha('');
+    }
+  }
+
+  // === PRODUTOS ===
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
     setForm((prev) => ({
@@ -136,7 +217,7 @@ export function Admin() {
     }));
   }
 
-  function handleSubmit(e) {
+  function handleSubmitProduto(e) {
     e.preventDefault();
 
     if (!form.name || !form.category) {
@@ -157,6 +238,13 @@ export function Admin() {
       category: form.category.trim(),
       stock: parseInt(form.stock) || 10,
       featured: form.featured,
+      custoMateriais: parseFloat(form.custoMateriais) || 0,
+      horasTrabalho: parseFloat(form.horasTrabalho) || 0,
+      custosExtras: parseFloat(form.custosExtras) || 0,
+      margemLucro: parseFloat(form.margemLucro) || 0,
+      precoManual: form.precoManual ? parseFloat(form.precoManual) : null,
+      precoSugerido: parseFloat(calcProduto.precoFinal.toFixed(2)),
+      lucro: parseFloat(calcProduto.lucro.toFixed(2)),
     };
 
     if (editandoId) {
@@ -172,7 +260,7 @@ export function Admin() {
     setTimeout(() => setMensagem(''), 2500);
   }
 
-  function handleEditar(produto) {
+  function handleEditarProduto(produto) {
     setForm({
       name: produto.name,
       description: produto.description,
@@ -180,17 +268,23 @@ export function Admin() {
       category: produto.category,
       stock: String(produto.stock || ''),
       featured: produto.featured || false,
+      custoMateriais: String(produto.custoMateriais || ''),
+      horasTrabalho: String(produto.horasTrabalho || ''),
+      custosExtras: String(produto.custosExtras || ''),
+      margemLucro: String(produto.margemLucro ?? 100),
+      precoManual: produto.precoManual ? String(produto.precoManual) : '',
     });
     setEditandoId(produto.id);
+    setAbaAtiva('produtos');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function handleCancelar() {
+  function handleCancelarProduto() {
     setForm(FORM_VAZIO);
     setEditandoId(null);
   }
 
-  function handleExcluir(id, nome) {
+  function handleExcluirProduto(id, nome) {
     if (confirm(`Excluir "${nome}"?`)) {
       removeProduct(id);
       setMensagem('🗑️ Produto excluído');
@@ -209,7 +303,6 @@ export function Admin() {
   }
 
   function handleRemoveCategoria(nome) {
-    // Checa se tem produto usando essa categoria
     const usada = products.some((p) => p.category === nome);
     if (usada) {
       alert(`Não é possível excluir "${nome}" — tem produtos usando essa categoria.`);
@@ -220,6 +313,71 @@ export function Admin() {
       setMensagem('🗑️ Categoria excluída');
       setTimeout(() => setMensagem(''), 2000);
     }
+  }
+
+  // === PRICING ===
+  function handleSalvarValorHora() {
+    const valor = parseFloat(valorHoraInput);
+    if (!valor || valor <= 0) {
+      setMensagem('⚠️ Digite um valor válido');
+      return;
+    }
+    atualizarPricing({ valorHora: valor });
+    setMensagem('✅ Valor da hora atualizado!');
+    setTimeout(() => setMensagem(''), 2000);
+  }
+
+  // === ORÇAMENTOS ===
+  function handleChangeOrcamento(e) {
+    const { name, value } = e.target;
+    setOrcamento((prev) => ({ ...prev, [name]: value }));
+  }
+
+  function handleSalvarOrcamento(e) {
+    e.preventDefault();
+    if (!orcamento.nome.trim()) {
+      setMensagem('⚠️ Dê um nome pro orçamento');
+      return;
+    }
+
+    const novo = {
+      nome: orcamento.nome.trim(),
+      cliente: orcamento.cliente.trim(),
+      custoMateriais: parseFloat(orcamento.custoMateriais) || 0,
+      horasTrabalho: parseFloat(orcamento.horasTrabalho) || 0,
+      custosExtras: parseFloat(orcamento.custosExtras) || 0,
+      margemLucro: parseFloat(orcamento.margemLucro) || 0,
+      precoManual: orcamento.precoManual ? parseFloat(orcamento.precoManual) : null,
+      precoFinal: parseFloat(calcOrcamento.precoFinal.toFixed(2)),
+      custoTotal: parseFloat(calcOrcamento.custoTotal.toFixed(2)),
+      lucro: parseFloat(calcOrcamento.lucro.toFixed(2)),
+      observacoes: orcamento.observacoes.trim(),
+    };
+
+    addOrcamento(novo);
+    setOrcamento(ORCAMENTO_VAZIO);
+    setMensagem('✅ Orçamento salvo!');
+    setTimeout(() => setMensagem(''), 2500);
+  }
+
+  function handleExcluirOrcamento(id, nome) {
+    if (confirm(`Excluir orçamento "${nome}"?`)) {
+      removeOrcamento(id);
+      setMensagem('🗑️ Orçamento excluído');
+      setTimeout(() => setMensagem(''), 2000);
+    }
+  }
+
+  function formatarData(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
 
   if (!logado) {
@@ -262,249 +420,639 @@ export function Admin() {
       <main className="admin">
         <div className="admin-head">
           <div>
-            <h1>Painel de produtos 🛠️</h1>
-            <p>Gerencie o catálogo do Cantinho da Lanna</p>
+            <h1>Painel Admin 🛠️</h1>
+            <p>Gerencie produtos, categorias e orçamentos</p>
           </div>
-          <Link to="/produtos" className="admin-btn-ver">
-            Ver catálogo →
-          </Link>
+          <div className="admin-head-actions">
+            <Link to="/produtos" className="admin-btn-ver">
+              Ver catálogo →
+            </Link>
+            <button className="admin-btn-sair" onClick={handleLogout}>
+              🚪 Sair
+            </button>
+          </div>
         </div>
 
         {mensagem && <div className="admin-mensagem">{mensagem}</div>}
 
-        {/* === GERENCIAR CATEGORIAS === */}
-        <section className="admin-form-section">
-          <h2>📂 Categorias</h2>
-          <p className="admin-hint">
-            Adicione as categorias que vai usar nos produtos.
-          </p>
+        {/* === ABAS === */}
+        <div className="admin-tabs">
+          <button
+            className={`admin-tab ${abaAtiva === 'produtos' ? 'active' : ''}`}
+            onClick={() => setAbaAtiva('produtos')}
+          >
+            📦 Produtos
+            <span className="admin-tab-count">{products.length}</span>
+          </button>
+          <button
+            className={`admin-tab ${abaAtiva === 'categorias' ? 'active' : ''}`}
+            onClick={() => setAbaAtiva('categorias')}
+          >
+            📂 Categorias
+            <span className="admin-tab-count">
+              {categories.filter((c) => c !== 'Todos').length}
+            </span>
+          </button>
+          <button
+            className={`admin-tab ${abaAtiva === 'precificacao' ? 'active' : ''}`}
+            onClick={() => setAbaAtiva('precificacao')}
+          >
+            💰 Precificação
+            <span className="admin-tab-count">{orcamentos.length}</span>
+          </button>
+        </div>
 
-          <form className="admin-cat-add" onSubmit={handleAddCategoria}>
-            <input
-              type="text"
-              placeholder="Nome da nova categoria (ex: Cadernos)"
-              value={novaCategoria}
-              onChange={(e) => setNovaCategoria(e.target.value)}
-            />
-            <button type="submit" className="admin-btn-primary">
-              ➕ Adicionar
-            </button>
-          </form>
+        {/* ================= ABA PRODUTOS ================= */}
+        {abaAtiva === 'produtos' && (
+          <>
+            <section className="admin-form-section">
+              <h2>{editandoId ? '✏️ Editar produto' : '➕ Novo produto'}</h2>
 
-          {categories.filter((c) => c !== 'Todos').length === 0 ? (
-            <p className="admin-vazio">Nenhuma categoria ainda 😢</p>
-          ) : (
-            <div className="admin-cat-list">
-              {categories
-                .filter((c) => c !== 'Todos')
-                .map((cat) => {
-                  const usada = products.some((p) => p.category === cat);
-                  const totalProdutos = products.filter((p) => p.category === cat).length;
+              <form className="admin-form" onSubmit={handleSubmitProduto}>
+                <div className="admin-grid">
+                  <label className="admin-field admin-field-wide">
+                    <span>Nome do produto *</span>
+                    <input
+                      type="text"
+                      name="name"
+                      value={form.name}
+                      onChange={handleChange}
+                      placeholder="Ex: Caderno Floral"
+                    />
+                  </label>
 
-                  return (
-                    <div key={cat} className="admin-cat-item">
-                      <span className="admin-cat-nome">{cat}</span>
-                      <span className="admin-cat-count">
-                        {totalProdutos} produto{totalProdutos !== 1 ? 's' : ''}
-                      </span>
-                      <button
-                        className="admin-cat-remove"
-                        onClick={() => handleRemoveCategoria(cat)}
-                        disabled={usada}
-                        title={usada ? 'Em uso' : 'Excluir'}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  );
-                })}
-            </div>
-          )}
-        </section>
+                  <label className="admin-field">
+                    <span>Categoria *</span>
+                    <select
+                      name="category"
+                      value={form.category}
+                      onChange={handleChange}
+                    >
+                      <option value="">Selecione...</option>
+                      {categories
+                        .filter((c) => c !== 'Todos')
+                        .map((cat) => (
+                          <option key={cat} value={cat}>
+                            {cat}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
 
-        {/* === FORMULÁRIO PRODUTO === */}
-        <section className="admin-form-section">
-          <h2>{editandoId ? '✏️ Editar produto' : '➕ Novo produto'}</h2>
+                  <label className="admin-field">
+                    <span>Estoque (opcional)</span>
+                    <input
+                      type="number"
+                      name="stock"
+                      value={form.stock}
+                      onChange={handleChange}
+                      placeholder="Ex: 20"
+                    />
+                  </label>
 
-          <form className="admin-form" onSubmit={handleSubmit}>
-            <div className="admin-grid">
-              <label className="admin-field admin-field-wide">
-                <span>Nome do produto *</span>
-                <input
-                  type="text"
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder="Ex: Caderno Floral"
-                />
-              </label>
+                  <div className="admin-field admin-field-wide">
+                    <span>Fotos do produto *</span>
 
-              <label className="admin-field">
-                <span>Categoria *</span>
-                <select
-                  name="category"
-                  value={form.category}
-                  onChange={handleChange}
-                >
-                  <option value="">Selecione...</option>
-                  {categories
-                    .filter((c) => c !== 'Todos')
-                    .map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                </select>
-              </label>
+                    <label className="admin-upload">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleUploadImagens}
+                        disabled={enviandoImagem}
+                        style={{ display: 'none' }}
+                      />
+                      <div className="admin-upload-box">
+                        <span className="admin-upload-emoji">
+                          {enviandoImagem ? '⏳' : '📷'}
+                        </span>
+                        <strong>
+                          {enviandoImagem
+                            ? 'Enviando imagens...'
+                            : 'Clique pra escolher fotos do PC'}
+                        </strong>
+                        <small>Pode escolher várias de uma vez (máx 3MB cada)</small>
+                      </div>
+                    </label>
 
-              <label className="admin-field">
-                <span>Estoque (opcional)</span>
-                <input
-                  type="number"
-                  name="stock"
-                  value={form.stock}
-                  onChange={handleChange}
-                  placeholder="Ex: 20"
-                />
-              </label>
-
-              <div className="admin-field admin-field-wide">
-                <span>Fotos do produto *</span>
-
-                <label className="admin-upload">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleUploadImagens}
-                    disabled={enviandoImagem}
-                    style={{ display: 'none' }}
-                  />
-                  <div className="admin-upload-box">
-                    <span className="admin-upload-emoji">
-                      {enviandoImagem ? '⏳' : '📷'}
-                    </span>
-                    <strong>
-                      {enviandoImagem
-                        ? 'Enviando imagens...'
-                        : 'Clique pra escolher fotos do PC'}
-                    </strong>
-                    <small>Pode escolher várias de uma vez (máx 3MB cada)</small>
+                    {form.images.length > 0 && (
+                      <div className="admin-images-preview">
+                        {form.images.map((url, i) => (
+                          <div key={i} className="admin-image-item">
+                            <img src={url} alt={`Foto ${i + 1}`} />
+                            {i === 0 && (
+                              <span className="admin-image-principal">Principal</span>
+                            )}
+                            <button
+                              type="button"
+                              className="admin-image-remove"
+                              onClick={() => handleRemoverImagem(i)}
+                              title="Remover"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                </label>
 
-                {form.images.length > 0 && (
-                  <div className="admin-images-preview">
-                    {form.images.map((url, i) => (
-                      <div key={i} className="admin-image-item">
-                        <img src={url} alt={`Foto ${i + 1}`} />
-                        {i === 0 && <span className="admin-image-principal">Principal</span>}
+                  <label className="admin-field admin-field-wide">
+                    <span>Descrição</span>
+                    <textarea
+                      rows="3"
+                      name="description"
+                      value={form.description}
+                      onChange={handleChange}
+                      placeholder="Descreva o produto..."
+                    />
+                  </label>
+
+                  <label className="admin-check admin-field-wide">
+                    <input
+                      type="checkbox"
+                      name="featured"
+                      checked={form.featured}
+                      onChange={handleChange}
+                    />
+                    <span>⭐ Marcar como destaque</span>
+                  </label>
+                </div>
+
+                {/* Precificação do produto */}
+                <div className="admin-pricing-section">
+                  <h3>💵 Precificação (só você vê)</h3>
+                  <p className="admin-pricing-subtitle">
+                    Preencha os custos e o sistema calcula o preço justo.
+                  </p>
+
+                  <div className="admin-grid">
+                    <label className="admin-field">
+                      <span>Custo dos materiais (R$)</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        name="custoMateriais"
+                        value={form.custoMateriais}
+                        onChange={handleChange}
+                        placeholder="Ex: 15.50"
+                      />
+                    </label>
+
+                    <label className="admin-field">
+                      <span>Horas de trabalho</span>
+                      <input
+                        type="number"
+                        step="0.1"
+                        name="horasTrabalho"
+                        value={form.horasTrabalho}
+                        onChange={handleChange}
+                        placeholder="Ex: 2"
+                      />
+                    </label>
+
+                    <label className="admin-field">
+                      <span>Custos extras (R$)</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        name="custosExtras"
+                        value={form.custosExtras}
+                        onChange={handleChange}
+                        placeholder="Embalagem, frete..."
+                      />
+                    </label>
+
+                    <label className="admin-field">
+                      <span>Margem de lucro (%)</span>
+                      <input
+                        type="number"
+                        step="1"
+                        name="margemLucro"
+                        value={form.margemLucro}
+                        onChange={handleChange}
+                        placeholder="Ex: 100"
+                      />
+                    </label>
+
+                    <label className="admin-field admin-field-wide">
+                      <span>Preço fixo (opcional)</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        name="precoManual"
+                        value={form.precoManual}
+                        onChange={handleChange}
+                        placeholder="Deixe vazio pra usar o preço calculado"
+                      />
+                    </label>
+                  </div>
+
+                  {(form.custoMateriais || form.horasTrabalho || form.custosExtras) && (
+                    <div className="admin-pricing-preview">
+                      <div className="admin-pricing-preview-row">
+                        <span>
+                          Mão de obra ({form.horasTrabalho || 0}h × R${' '}
+                          {pricing?.valorHora || 25})
+                        </span>
+                        <strong>R$ {calcProduto.custoMaoDeObra.toFixed(2)}</strong>
+                      </div>
+                      <div className="admin-pricing-preview-row">
+                        <span>Custo total</span>
+                        <strong>R$ {calcProduto.custoTotal.toFixed(2)}</strong>
+                      </div>
+                      <div className="admin-pricing-preview-row">
+                        <span>Lucro ({form.margemLucro || 0}%)</span>
+                        <strong>R$ {calcProduto.lucro.toFixed(2)}</strong>
+                      </div>
+                      <div className="admin-pricing-preview-total">
+                        <span>💰 Preço final</span>
+                        <strong>R$ {calcProduto.precoFinal.toFixed(2)}</strong>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="admin-form-actions">
+                  <button
+                    type="submit"
+                    className="admin-btn-primary"
+                    disabled={enviandoImagem}
+                  >
+                    {editandoId ? '💾 Salvar alterações' : '➕ Adicionar produto'}
+                  </button>
+
+                  {editandoId && (
+                    <button
+                      type="button"
+                      className="admin-btn-secundario"
+                      onClick={handleCancelarProduto}
+                    >
+                      Cancelar
+                    </button>
+                  )}
+                </div>
+              </form>
+            </section>
+
+            <section className="admin-lista-section">
+              <div className="admin-lista-head">
+                <h2>📦 Produtos cadastrados ({products.length})</h2>
+              </div>
+
+              {products.length === 0 ? (
+                <p className="admin-vazio">Nenhum produto cadastrado ainda 😢</p>
+              ) : (
+                <div className="admin-lista">
+                  {products.map((p) => {
+                    const capa = p.images?.[0] || p.image;
+                    const precoFinal = p.precoManual || p.precoSugerido;
+
+                    return (
+                      <article key={p.id} className="admin-item">
+                        <img src={capa} alt={p.name} />
+
+                        <div className="admin-item-info">
+                          <span className="admin-item-cat">{p.category}</span>
+                          <strong>{p.name}</strong>
+                          {p.images?.length > 1 && (
+                            <span className="admin-item-fotos">
+                              📷 {p.images.length} fotos
+                            </span>
+                          )}
+                          {precoFinal > 0 && (
+                            <span className="admin-item-preco">
+                              💰 R$ {precoFinal.toFixed(2)}
+                              {p.lucro > 0 && (
+                                <small> · lucro R$ {p.lucro.toFixed(2)}</small>
+                              )}
+                            </span>
+                          )}
+                          {p.featured && (
+                            <span className="admin-item-destaque">✨ Destaque</span>
+                          )}
+                        </div>
+
+                        <div className="admin-item-acoes">
+                          <button
+                            className="admin-btn-editar"
+                            onClick={() => handleEditarProduto(p)}
+                            title="Editar"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            className="admin-btn-excluir"
+                            onClick={() => handleExcluirProduto(p.id, p.name)}
+                            title="Excluir"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+          </>
+        )}
+
+        {/* ================= ABA CATEGORIAS ================= */}
+        {abaAtiva === 'categorias' && (
+          <section className="admin-form-section">
+            <h2>📂 Gerenciar categorias</h2>
+            <p className="admin-hint">
+              Adicione as categorias que vai usar nos produtos.
+            </p>
+
+            <form className="admin-cat-add" onSubmit={handleAddCategoria}>
+              <input
+                type="text"
+                placeholder="Nome da nova categoria (ex: Cadernos)"
+                value={novaCategoria}
+                onChange={(e) => setNovaCategoria(e.target.value)}
+              />
+              <button type="submit" className="admin-btn-primary">
+                ➕ Adicionar
+              </button>
+            </form>
+
+            {categories.filter((c) => c !== 'Todos').length === 0 ? (
+              <p className="admin-vazio">Nenhuma categoria ainda 😢</p>
+            ) : (
+              <div className="admin-cat-list">
+                {categories
+                  .filter((c) => c !== 'Todos')
+                  .map((cat) => {
+                    const usada = products.some((p) => p.category === cat);
+                    const totalProdutos = products.filter(
+                      (p) => p.category === cat
+                    ).length;
+
+                    return (
+                      <div key={cat} className="admin-cat-item">
+                        <span className="admin-cat-nome">{cat}</span>
+                        <span className="admin-cat-count">
+                          {totalProdutos} produto{totalProdutos !== 1 ? 's' : ''}
+                        </span>
                         <button
-                          type="button"
-                          className="admin-image-remove"
-                          onClick={() => handleRemoverImagem(i)}
-                          title="Remover"
+                          className="admin-cat-remove"
+                          onClick={() => handleRemoveCategoria(cat)}
+                          disabled={usada}
+                          title={usada ? 'Em uso' : 'Excluir'}
                         >
                           ✕
                         </button>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    );
+                  })}
               </div>
+            )}
+          </section>
+        )}
 
-              <label className="admin-field admin-field-wide">
-                <span>Descrição</span>
-                <textarea
-                  rows="3"
-                  name="description"
-                  value={form.description}
-                  onChange={handleChange}
-                  placeholder="Descreva o produto..."
-                />
-              </label>
+        {/* ================= ABA PRECIFICAÇÃO ================= */}
+        {abaAtiva === 'precificacao' && (
+          <>
+            {/* Config valor hora */}
+            <section className="admin-form-section admin-pricing-config">
+              <h2>⚙️ Valor da sua hora</h2>
+              <p className="admin-hint">
+                Defina quanto vale a sua hora de trabalho. Esse valor será usado
+                em todos os cálculos.
+              </p>
 
-              <label className="admin-check admin-field-wide">
-                <input
-                  type="checkbox"
-                  name="featured"
-                  checked={form.featured}
-                  onChange={handleChange}
-                />
-                <span>⭐ Marcar como destaque</span>
-              </label>
-            </div>
+              <div className="admin-pricing-config-row">
+                <label className="admin-field">
+                  <span>Valor da hora (R$)</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={valorHoraInput}
+                    onChange={(e) => setValorHoraInput(e.target.value)}
+                    placeholder="Ex: 25.00"
+                  />
+                </label>
 
-            <div className="admin-form-actions">
-              <button
-                type="submit"
-                className="admin-btn-primary"
-                disabled={enviandoImagem}
-              >
-                {editandoId ? '💾 Salvar alterações' : '➕ Adicionar produto'}
-              </button>
-
-              {editandoId && (
                 <button
                   type="button"
-                  className="admin-btn-secundario"
-                  onClick={handleCancelar}
+                  className="admin-btn-primary"
+                  onClick={handleSalvarValorHora}
                 >
-                  Cancelar
+                  💾 Salvar
                 </button>
-              )}
-            </div>
-          </form>
-        </section>
+              </div>
 
-        <section className="admin-lista-section">
-          <div className="admin-lista-head">
-            <h2>📦 Produtos cadastrados ({products.length})</h2>
-          </div>
+              <p className="admin-pricing-hint">
+                💡 Valor atual:{' '}
+                <strong>
+                  R$ {pricing?.valorHora?.toFixed(2) || '25.00'}/hora
+                </strong>
+              </p>
+            </section>
 
-          {products.length === 0 ? (
-            <p className="admin-vazio">Nenhum produto cadastrado ainda 😢</p>
-          ) : (
-            <div className="admin-lista">
-              {products.map((p) => {
-                const capa = p.images?.[0] || p.image;
-                return (
-                  <article key={p.id} className="admin-item">
-                    <img src={capa} alt={p.name} />
+            {/* Calculadora */}
+            <section className="admin-form-section">
+              <h2>🧮 Calculadora de orçamento</h2>
+              <p className="admin-hint">
+                Precifique qualquer coisa: um pedido personalizado, uma
+                encomenda, um kit...
+              </p>
 
-                    <div className="admin-item-info">
-                      <span className="admin-item-cat">{p.category}</span>
-                      <strong>{p.name}</strong>
-                      {p.images?.length > 1 && (
-                        <span className="admin-item-fotos">
-                          📷 {p.images.length} fotos
+              <form className="admin-form" onSubmit={handleSalvarOrcamento}>
+                <div className="admin-grid">
+                  <label className="admin-field">
+                    <span>Nome do item/projeto *</span>
+                    <input
+                      type="text"
+                      name="nome"
+                      value={orcamento.nome}
+                      onChange={handleChangeOrcamento}
+                      placeholder="Ex: Topo de bolo personalizado"
+                    />
+                  </label>
+
+                  <label className="admin-field">
+                    <span>Cliente (opcional)</span>
+                    <input
+                      type="text"
+                      name="cliente"
+                      value={orcamento.cliente}
+                      onChange={handleChangeOrcamento}
+                      placeholder="Nome da cliente"
+                    />
+                  </label>
+
+                  <label className="admin-field">
+                    <span>Custo dos materiais (R$)</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      name="custoMateriais"
+                      value={orcamento.custoMateriais}
+                      onChange={handleChangeOrcamento}
+                      placeholder="Ex: 15.50"
+                    />
+                  </label>
+
+                  <label className="admin-field">
+                    <span>Horas de trabalho</span>
+                    <input
+                      type="number"
+                      step="0.1"
+                      name="horasTrabalho"
+                      value={orcamento.horasTrabalho}
+                      onChange={handleChangeOrcamento}
+                      placeholder="Ex: 2"
+                    />
+                  </label>
+
+                  <label className="admin-field">
+                    <span>Custos extras (R$)</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      name="custosExtras"
+                      value={orcamento.custosExtras}
+                      onChange={handleChangeOrcamento}
+                      placeholder="Embalagem, frete..."
+                    />
+                  </label>
+
+                  <label className="admin-field">
+                    <span>Margem de lucro (%)</span>
+                    <input
+                      type="number"
+                      step="1"
+                      name="margemLucro"
+                      value={orcamento.margemLucro}
+                      onChange={handleChangeOrcamento}
+                      placeholder="Ex: 100"
+                    />
+                  </label>
+
+                  <label className="admin-field">
+                    <span>Preço fixo (opcional)</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      name="precoManual"
+                      value={orcamento.precoManual}
+                      onChange={handleChangeOrcamento}
+                      placeholder="Deixe vazio pro calculado"
+                    />
+                  </label>
+
+                  <label className="admin-field admin-field-wide">
+                    <span>Observações</span>
+                    <textarea
+                      rows="2"
+                      name="observacoes"
+                      value={orcamento.observacoes}
+                      onChange={handleChangeOrcamento}
+                      placeholder="Detalhes do pedido, prazo, etc..."
+                    />
+                  </label>
+                </div>
+
+                {/* Preview do cálculo */}
+                {(orcamento.custoMateriais ||
+                  orcamento.horasTrabalho ||
+                  orcamento.custosExtras) && (
+                  <div className="admin-pricing-preview">
+                    <div className="admin-pricing-preview-row">
+                      <span>
+                        Mão de obra ({orcamento.horasTrabalho || 0}h × R${' '}
+                        {pricing?.valorHora || 25})
+                      </span>
+                      <strong>R$ {calcOrcamento.custoMaoDeObra.toFixed(2)}</strong>
+                    </div>
+                    <div className="admin-pricing-preview-row">
+                      <span>Custo total</span>
+                      <strong>R$ {calcOrcamento.custoTotal.toFixed(2)}</strong>
+                    </div>
+                    <div className="admin-pricing-preview-row">
+                      <span>Lucro ({orcamento.margemLucro || 0}%)</span>
+                      <strong>R$ {calcOrcamento.lucro.toFixed(2)}</strong>
+                    </div>
+                    <div className="admin-pricing-preview-total">
+                      <span>💰 Preço final</span>
+                      <strong>R$ {calcOrcamento.precoFinal.toFixed(2)}</strong>
+                    </div>
+                  </div>
+                )}
+
+                <div className="admin-form-actions">
+                  <button type="submit" className="admin-btn-primary">
+                    💾 Salvar orçamento
+                  </button>
+                  <button
+                    type="button"
+                    className="admin-btn-secundario"
+                    onClick={() => setOrcamento(ORCAMENTO_VAZIO)}
+                  >
+                    Limpar
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            {/* Histórico */}
+            <section className="admin-lista-section">
+              <div className="admin-lista-head">
+                <h2>📋 Orçamentos salvos ({orcamentos.length})</h2>
+              </div>
+
+              {orcamentos.length === 0 ? (
+                <p className="admin-vazio">
+                  Nenhum orçamento salvo ainda 😢
+                </p>
+              ) : (
+                <div className="admin-lista">
+                  {orcamentos.map((o) => (
+                    <article key={o.id} className="admin-item admin-orcamento-item">
+                      <div className="admin-orcamento-icon">💰</div>
+
+                      <div className="admin-item-info">
+                        <strong>{o.nome}</strong>
+                        {o.cliente && (
+                          <span className="admin-orcamento-cliente">
+                            👤 {o.cliente}
+                          </span>
+                        )}
+                        <span className="admin-item-preco">
+                          R$ {o.precoFinal?.toFixed(2)}
+                          {o.lucro > 0 && (
+                            <small> · lucro R$ {o.lucro.toFixed(2)}</small>
+                          )}
                         </span>
-                      )}
-                      {p.featured && <span className="admin-item-destaque">✨ Destaque</span>}
-                    </div>
+                        {o.observacoes && (
+                          <span className="admin-orcamento-obs">
+                            📝 {o.observacoes}
+                          </span>
+                        )}
+                        <span className="admin-orcamento-data">
+                          🕐 {formatarData(o.criadoEm)}
+                        </span>
+                      </div>
 
-                    <div className="admin-item-acoes">
-                      <button
-                        className="admin-btn-editar"
-                        onClick={() => handleEditar(p)}
-                        title="Editar"
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        className="admin-btn-excluir"
-                        onClick={() => handleExcluir(p.id, p.name)}
-                        title="Excluir"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          )}
-        </section>
+                      <div className="admin-item-acoes">
+                        <button
+                          className="admin-btn-excluir"
+                          onClick={() => handleExcluirOrcamento(o.id, o.nome)}
+                          title="Excluir"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </section>
+          </>
+        )}
       </main>
     </>
   );
