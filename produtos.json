@@ -149,21 +149,5 @@
       "id": "1790528313510"
     }
   ],
-  "orcamentos": [
-    {
-      "nome": "Topo de Bolo Musico",
-      "cliente": "Jefferson Rodrigo de Lima",
-      "custoMateriais": 20,
-      "horasTrabalho": 0,
-      "custosExtras": 5,
-      "margemLucro": 50,
-      "precoManual": null,
-      "precoFinal": 37.5,
-      "custoTotal": 25,
-      "lucro": 12.5,
-      "observacoes": "",
-      "id": "1790626406350",
-      "criadoEm": "2026-09-28T20:13:26.350Z"
-    }
-  ]
+  "orcamentos": []
 }
