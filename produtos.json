@@ -6,6 +6,9 @@
     "Flores",
     "Envelopes"
   ],
+  "pricing": {
+    "valorHora": 25
+  },
   "products": [
     {
       "name": "Topo de Bolo Corinthians",
@@ -145,5 +148,6 @@
       "featured": true,
       "id": "1790528313510"
     }
-  ]
+  ],
+  "orcamentos": []
 }
