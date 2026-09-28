@@ -7,7 +7,7 @@
     "Envelopes"
   ],
   "pricing": {
-    "valorHora": 25
+    "valorHora": 8
   },
   "products": [
     {
@@ -149,5 +149,21 @@
       "id": "1790528313510"
     }
   ],
-  "orcamentos": []
+  "orcamentos": [
+    {
+      "nome": "Topo de Bolo Musico",
+      "cliente": "Jefferson Rodrigo de Lima",
+      "custoMateriais": 15,
+      "horasTrabalho": 2,
+      "custosExtras": 5,
+      "margemLucro": 30,
+      "precoManual": null,
+      "precoFinal": 46.8,
+      "custoTotal": 36,
+      "lucro": 10.8,
+      "observacoes": "",
+      "id": "1790626796321",
+      "criadoEm": "2026-09-28T20:19:56.321Z"
+    }
+  ]
 }
