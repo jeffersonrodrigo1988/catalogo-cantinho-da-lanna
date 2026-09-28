@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Header } from '../../components/Header/Header';
 import { Footer } from '../../components/Footer/Footer';
-import { abrirWhatsApp } from '../../utils/whatsapp';
 import { MENSAGEM_SAUDACAO, WHATSAPP_NUMBER } from '../../config';
 import './Contato.css';
 
@@ -14,10 +13,18 @@ export function Contato() {
     '+$1 ($2) $3-$4'
   );
 
+  // 🎯 Links diretos (funcionam em qualquer lugar)
+  const linkWhatsApp = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+    MENSAGEM_SAUDACAO
+  )}`;
+
   function handleEnviar(e) {
     e.preventDefault();
-    const texto = `Olá! Meu nome é ${nome || '(não informado)'} 💕\n\n${mensagem || MENSAGEM_SAUDACAO}`;
-    abrirWhatsApp(texto);
+    const texto = `Olá! Meu nome é ${nome || '(não informado)'} 💕\n\n${
+      mensagem || MENSAGEM_SAUDACAO
+    }`;
+    const link = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(texto)}`;
+    window.open(link, '_blank');
   }
 
   return (
@@ -48,12 +55,14 @@ export function Contato() {
             </div>
             <h3>WhatsApp</h3>
             <p>{numeroFormatado}</p>
-            <button
+            <a
               className="contato-card-btn"
-              onClick={() => abrirWhatsApp(MENSAGEM_SAUDACAO)}
+              href={linkWhatsApp}
+              target="_blank"
+              rel="noopener noreferrer"
             >
               Conversar agora
-            </button>
+            </a>
           </article>
 
           <article className="contato-card">
@@ -65,10 +74,10 @@ export function Contato() {
               </svg>
             </div>
             <h3>Instagram</h3>
-            <p>@cantinhodalanna</p>
+            <p>@cantinhodalannaofficial</p>
             <a
               className="contato-card-btn"
-              href="https://instagram.com/cantinhodalanna"
+              href="https://instagram.com/cantinhodalannaofficial"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -84,10 +93,10 @@ export function Contato() {
               </svg>
             </div>
             <h3>E-mail</h3>
-            <p>cantinhodalannaoficial@gmail.com</p>
+            <p>cantinhodalannaofficial@gmail.com</p>
             <a
               className="contato-card-btn"
-              href="mailto:contato@cantinhodalanna.com"
+              href="mailto:cantinhodalannaofficial@gmail.com"
             >
               Enviar e-mail
             </a>
@@ -164,6 +173,7 @@ export function Contato() {
             <span className="contato-horario-icone">💬</span>
             <div>
               <h3>Atendimento online</h3>
+              <p>Atendemos todo o Brasil</p>
               <p>Fale com a gente pelo WhatsApp</p>
             </div>
           </div>
