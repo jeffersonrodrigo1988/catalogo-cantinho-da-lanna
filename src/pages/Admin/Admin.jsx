@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { invoke } from '@tauri-apps/api/core';
 import { Header } from '../../components/Header/Header';
+import { Calculadora } from '../../components/Calculadora/Calculadora';
 import { useProducts } from '../../context/ProductsContext';
 import { ADMIN_PASSWORD } from '../../config';
 import { isTauri } from '../../utils/tauri';
@@ -68,7 +69,6 @@ export function Admin() {
 
   // Calculadora de orçamento
   const [orcamento, setOrcamento] = useState(ORCAMENTO_VAZIO);
-  const [orcamentoEditando, setOrcamentoEditando] = useState(null);
 
   useEffect(() => {
     if (pricing?.valorHora) {
@@ -852,7 +852,17 @@ export function Admin() {
               </p>
             </section>
 
-            {/* Calculadora */}
+            {/* Calculadora rápida */}
+            <section className="admin-form-section">
+              <h2>🖩 Calculadora rápida</h2>
+              <p className="admin-hint">
+                Faça qualquer conta do dia a dia. Ideal pra calcular custos de
+                materiais antes de preencher o orçamento.
+              </p>
+              <Calculadora />
+            </section>
+
+            {/* Calculadora de orçamento */}
             <section className="admin-form-section">
               <h2>🧮 Calculadora de orçamento</h2>
               <p className="admin-hint">
