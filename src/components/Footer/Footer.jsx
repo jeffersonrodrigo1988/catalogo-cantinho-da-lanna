@@ -14,7 +14,6 @@ export function Footer() {
     '+$1 ($2) $3-$4'
   );
 
-  // Pega as categorias (sem "Todos") e limita a 6
   const categoriasReais = categories.filter((c) => c !== 'Todos').slice(0, 6);
 
   return (
@@ -34,7 +33,7 @@ export function Footer() {
           </p>
           <div className="footer-social">
             <a
-              href="https://instagram.com/cantinhodalanna"
+              href="https://www.instagram.com/cantinhodalannaoficial/"
               target="_blank"
               rel="noopener noreferrer"
               className="footer-social-btn"
@@ -56,7 +55,7 @@ export function Footer() {
               </svg>
             </button>
             <a
-              href="mailto:contato@cantinhodalanna.com"
+              href="mailto:cantinhodalannaofficial@gmail.com"
               className="footer-social-btn"
               aria-label="E-mail"
             >
@@ -107,14 +106,14 @@ export function Footer() {
                 <rect x="2" y="4" width="20" height="16" rx="2"/>
                 <path d="m22 6-10 7L2 6"/>
               </svg>
-              <span>cantinhodalannaoficial@gmail.com</span>
+              <span>cantinhodalannaofficial@gmail.com</span>
             </li>
             <li>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <polyline points="12 6 12 12 16 14"/>
               </svg>
-              <span>Seg a sex — 9h30 às 19h</span>
+              <span>Seg a sex — 9h às 18h</span>
             </li>
           </ul>
         </div>

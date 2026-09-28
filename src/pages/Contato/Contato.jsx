@@ -13,7 +13,6 @@ export function Contato() {
     '+$1 ($2) $3-$4'
   );
 
-  // 🎯 Links diretos (funcionam em qualquer lugar)
   const linkWhatsApp = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
     MENSAGEM_SAUDACAO
   )}`;
@@ -74,10 +73,10 @@ export function Contato() {
               </svg>
             </div>
             <h3>Instagram</h3>
-            <p>@cantinhodalannaofficial</p>
+            <p>@cantinhodalannaoficial</p>
             <a
               className="contato-card-btn"
-              href="https://instagram.com/cantinhodalannaofficial"
+              href="https://www.instagram.com/cantinhodalannaoficial/"
               target="_blank"
               rel="noopener noreferrer"
             >
