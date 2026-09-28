@@ -249,6 +249,19 @@
   color: var(--white);
 }
 
+/* ============ VALOR DA HORA + CALCULADORA LADO A LADO ============ */
+.admin-duo {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.admin-duo .admin-pricing-config {
+  height: 100%;
+  margin: 0;
+}
+
 /* ============ CATEGORIAS ============ */
 .admin-hint {
   font-size: 0.88rem;
@@ -583,7 +596,7 @@
 
 .admin-pricing-config-row .admin-field {
   flex: 1;
-  min-width: 180px;
+  min-width: 140px;
 }
 
 .admin-pricing-hint {
@@ -826,6 +839,12 @@
 }
 
 /* ============ RESPONSIVO ============ */
+@media (max-width: 900px) {
+  .admin-duo {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 700px) {
   .admin {
     padding: 1.5rem 1rem;

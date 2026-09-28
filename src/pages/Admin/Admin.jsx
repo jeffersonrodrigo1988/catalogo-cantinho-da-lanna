@@ -815,51 +815,51 @@ export function Admin() {
         {/* ================= ABA PRECIFICAÇÃO ================= */}
         {abaAtiva === 'precificacao' && (
           <>
-            {/* Config valor hora */}
-            <section className="admin-form-section admin-pricing-config">
-              <h2>⚙️ Valor da sua hora</h2>
-              <p className="admin-hint">
-                Defina quanto vale a sua hora de trabalho. Esse valor será usado
-                em todos os cálculos.
-              </p>
+            {/* Valor da hora + Calculadora lado a lado */}
+            <section className="admin-duo">
+              <div className="admin-form-section admin-pricing-config">
+                <h2>⚙️ Valor da sua hora</h2>
+                <p className="admin-hint">
+                  Defina quanto vale a sua hora de trabalho. Esse valor será
+                  usado em todos os cálculos.
+                </p>
 
-              <div className="admin-pricing-config-row">
-                <label className="admin-field">
-                  <span>Valor da hora (R$)</span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={valorHoraInput}
-                    onChange={(e) => setValorHoraInput(e.target.value)}
-                    placeholder="Ex: 25.00"
-                  />
-                </label>
+                <div className="admin-pricing-config-row">
+                  <label className="admin-field">
+                    <span>Valor da hora (R$)</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={valorHoraInput}
+                      onChange={(e) => setValorHoraInput(e.target.value)}
+                      placeholder="Ex: 25.00"
+                    />
+                  </label>
 
-                <button
-                  type="button"
-                  className="admin-btn-primary"
-                  onClick={handleSalvarValorHora}
-                >
-                  💾 Salvar
-                </button>
+                  <button
+                    type="button"
+                    className="admin-btn-primary"
+                    onClick={handleSalvarValorHora}
+                  >
+                    💾 Salvar
+                  </button>
+                </div>
+
+                <p className="admin-pricing-hint">
+                  💡 Valor atual:{' '}
+                  <strong>
+                    R$ {pricing?.valorHora?.toFixed(2) || '25.00'}/hora
+                  </strong>
+                </p>
               </div>
 
-              <p className="admin-pricing-hint">
-                💡 Valor atual:{' '}
-                <strong>
-                  R$ {pricing?.valorHora?.toFixed(2) || '25.00'}/hora
-                </strong>
-              </p>
-            </section>
-
-            {/* Calculadora rápida */}
-            <section className="admin-form-section">
-              <h2>🖩 Calculadora rápida</h2>
-              <p className="admin-hint">
-                Faça qualquer conta do dia a dia. Ideal pra calcular custos de
-                materiais antes de preencher o orçamento.
-              </p>
-              <Calculadora />
+              <div className="admin-form-section">
+                <h2>🖩 Calculadora rápida</h2>
+                <p className="admin-hint">
+                  Faça contas rápidas antes de preencher o orçamento.
+                </p>
+                <Calculadora />
+              </div>
             </section>
 
             {/* Calculadora de orçamento */}
