@@ -149,5 +149,17 @@
       "id": "1790528313510"
     }
   ],
-  "orcamentos": []
+  "orcamentos": [],
+  "insumos": [
+    {
+      "nome": "Papel Sulfite",
+      "preco": 33,
+      "unidade": "500",
+      "id": "1790629118136"
+    }
+  ],
+  "custosFixos": {
+    "itens": [],
+    "horasPorMes": 160
+  }
 }
