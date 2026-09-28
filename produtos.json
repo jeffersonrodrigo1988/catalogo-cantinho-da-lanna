@@ -154,8 +154,8 @@
     {
       "nome": "Papel Sulfite",
       "precoPacote": 32,
-      "quantidadePacote": 15,
-      "unidade": "500",
+      "quantidadePacote": 500,
+      "unidade": "un",
       "id": "1790629118136"
     }
   ],
