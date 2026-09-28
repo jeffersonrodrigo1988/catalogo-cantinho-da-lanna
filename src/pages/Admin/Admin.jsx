@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { invoke } from '@tauri-apps/api/core';
 import { Header } from '../../components/Header/Header';
 import { Calculadora } from '../../components/Calculadora/Calculadora';
+import { ProductCard } from '../../components/ProductCard/ProductCard';
 import { useProducts } from '../../context/ProductsContext';
 import { ADMIN_PASSWORD } from '../../config';
 import { isTauri } from '../../utils/tauri';
@@ -66,6 +67,7 @@ export function Admin() {
   const [enviandoImagem, setEnviandoImagem] = useState(false);
   const [novaCategoria, setNovaCategoria] = useState('');
   const [valorHoraInput, setValorHoraInput] = useState('25');
+  const [mostrarPreview, setMostrarPreview] = useState(true);
 
   // Calculadora de orçamento
   const [orcamento, setOrcamento] = useState(ORCAMENTO_VAZIO);
@@ -132,6 +134,17 @@ export function Admin() {
 
   const calcProduto = calcular(form);
   const calcOrcamento = calcular(orcamento);
+
+  // === PREVIEW DO PRODUTO ===
+  const produtoPreview = {
+    id: 'preview',
+    name: form.name || 'Nome do produto',
+    description: form.description || 'Descrição do produto',
+    category: form.category || 'Categoria',
+    images: form.images,
+    image: form.images[0] || '',
+    featured: form.featured,
+  };
 
   // === LOGIN ===
   function handleLogin(e) {
@@ -465,235 +478,269 @@ export function Admin() {
         {/* ================= ABA PRODUTOS ================= */}
         {abaAtiva === 'produtos' && (
           <>
-            <section className="admin-form-section">
-              <h2>{editandoId ? '✏️ Editar produto' : '➕ Novo produto'}</h2>
+            <div className="admin-form-with-preview">
+              <section className="admin-form-section">
+                <div className="admin-form-header">
+                  <h2>{editandoId ? '✏️ Editar produto' : '➕ Novo produto'}</h2>
+                  <button
+                    type="button"
+                    className="admin-preview-toggle"
+                    onClick={() => setMostrarPreview(!mostrarPreview)}
+                  >
+                    {mostrarPreview ? '🙈 Esconder preview' : '👁️ Mostrar preview'}
+                  </button>
+                </div>
 
-              <form className="admin-form" onSubmit={handleSubmitProduto}>
-                <div className="admin-grid">
-                  <label className="admin-field admin-field-wide">
-                    <span>Nome do produto *</span>
-                    <input
-                      type="text"
-                      name="name"
-                      value={form.name}
-                      onChange={handleChange}
-                      placeholder="Ex: Caderno Floral"
-                    />
-                  </label>
-
-                  <label className="admin-field">
-                    <span>Categoria *</span>
-                    <select
-                      name="category"
-                      value={form.category}
-                      onChange={handleChange}
-                    >
-                      <option value="">Selecione...</option>
-                      {categories
-                        .filter((c) => c !== 'Todos')
-                        .map((cat) => (
-                          <option key={cat} value={cat}>
-                            {cat}
-                          </option>
-                        ))}
-                    </select>
-                  </label>
-
-                  <label className="admin-field">
-                    <span>Estoque (opcional)</span>
-                    <input
-                      type="number"
-                      name="stock"
-                      value={form.stock}
-                      onChange={handleChange}
-                      placeholder="Ex: 20"
-                    />
-                  </label>
-
-                  <div className="admin-field admin-field-wide">
-                    <span>Fotos do produto *</span>
-
-                    <label className="admin-upload">
+                <form className="admin-form" onSubmit={handleSubmitProduto}>
+                  <div className="admin-grid">
+                    <label className="admin-field admin-field-wide">
+                      <span>Nome do produto *</span>
                       <input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={handleUploadImagens}
-                        disabled={enviandoImagem}
-                        style={{ display: 'none' }}
+                        type="text"
+                        name="name"
+                        value={form.name}
+                        onChange={handleChange}
+                        placeholder="Ex: Caderno Floral"
                       />
-                      <div className="admin-upload-box">
-                        <span className="admin-upload-emoji">
-                          {enviandoImagem ? '⏳' : '📷'}
-                        </span>
-                        <strong>
-                          {enviandoImagem
-                            ? 'Enviando imagens...'
-                            : 'Clique pra escolher fotos do PC'}
-                        </strong>
-                        <small>Pode escolher várias de uma vez (máx 3MB cada)</small>
-                      </div>
                     </label>
 
-                    {form.images.length > 0 && (
-                      <div className="admin-images-preview">
-                        {form.images.map((url, i) => (
-                          <div key={i} className="admin-image-item">
-                            <img src={url} alt={`Foto ${i + 1}`} />
-                            {i === 0 && (
-                              <span className="admin-image-principal">Principal</span>
-                            )}
-                            <button
-                              type="button"
-                              className="admin-image-remove"
-                              onClick={() => handleRemoverImagem(i)}
-                              title="Remover"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ))}
+                    <label className="admin-field">
+                      <span>Categoria *</span>
+                      <select
+                        name="category"
+                        value={form.category}
+                        onChange={handleChange}
+                      >
+                        <option value="">Selecione...</option>
+                        {categories
+                          .filter((c) => c !== 'Todos')
+                          .map((cat) => (
+                            <option key={cat} value={cat}>
+                              {cat}
+                            </option>
+                          ))}
+                      </select>
+                    </label>
+
+                    <label className="admin-field">
+                      <span>Estoque (opcional)</span>
+                      <input
+                        type="number"
+                        name="stock"
+                        value={form.stock}
+                        onChange={handleChange}
+                        placeholder="Ex: 20"
+                      />
+                    </label>
+
+                    <div className="admin-field admin-field-wide">
+                      <span>Fotos do produto *</span>
+
+                      <label className="admin-upload">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handleUploadImagens}
+                          disabled={enviandoImagem}
+                          style={{ display: 'none' }}
+                        />
+                        <div className="admin-upload-box">
+                          <span className="admin-upload-emoji">
+                            {enviandoImagem ? '⏳' : '📷'}
+                          </span>
+                          <strong>
+                            {enviandoImagem
+                              ? 'Enviando imagens...'
+                              : 'Clique pra escolher fotos do PC'}
+                          </strong>
+                          <small>Pode escolher várias de uma vez (máx 3MB cada)</small>
+                        </div>
+                      </label>
+
+                      {form.images.length > 0 && (
+                        <div className="admin-images-preview">
+                          {form.images.map((url, i) => (
+                            <div key={i} className="admin-image-item">
+                              <img src={url} alt={`Foto ${i + 1}`} />
+                              {i === 0 && (
+                                <span className="admin-image-principal">Principal</span>
+                              )}
+                              <button
+                                type="button"
+                                className="admin-image-remove"
+                                onClick={() => handleRemoverImagem(i)}
+                                title="Remover"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <label className="admin-field admin-field-wide">
+                      <span>Descrição</span>
+                      <textarea
+                        rows="3"
+                        name="description"
+                        value={form.description}
+                        onChange={handleChange}
+                        placeholder="Descreva o produto..."
+                      />
+                    </label>
+
+                    <label className="admin-check admin-field-wide">
+                      <input
+                        type="checkbox"
+                        name="featured"
+                        checked={form.featured}
+                        onChange={handleChange}
+                      />
+                      <span>⭐ Marcar como destaque</span>
+                    </label>
+                  </div>
+
+                  {/* Precificação do produto */}
+                  <div className="admin-pricing-section">
+                    <h3>💵 Precificação (só você vê)</h3>
+                    <p className="admin-pricing-subtitle">
+                      Preencha os custos e o sistema calcula o preço justo.
+                    </p>
+
+                    <div className="admin-grid">
+                      <label className="admin-field">
+                        <span>Custo dos materiais (R$)</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          name="custoMateriais"
+                          value={form.custoMateriais}
+                          onChange={handleChange}
+                          placeholder="Ex: 15.50"
+                        />
+                      </label>
+
+                      <label className="admin-field">
+                        <span>Horas de trabalho</span>
+                        <input
+                          type="number"
+                          step="0.1"
+                          name="horasTrabalho"
+                          value={form.horasTrabalho}
+                          onChange={handleChange}
+                          placeholder="Ex: 2"
+                        />
+                      </label>
+
+                      <label className="admin-field">
+                        <span>Custos extras (R$)</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          name="custosExtras"
+                          value={form.custosExtras}
+                          onChange={handleChange}
+                          placeholder="Embalagem, frete..."
+                        />
+                      </label>
+
+                      <label className="admin-field">
+                        <span>Margem de lucro (%)</span>
+                        <input
+                          type="number"
+                          step="1"
+                          name="margemLucro"
+                          value={form.margemLucro}
+                          onChange={handleChange}
+                          placeholder="Ex: 100"
+                        />
+                      </label>
+
+                      <label className="admin-field admin-field-wide">
+                        <span>Preço fixo (opcional)</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          name="precoManual"
+                          value={form.precoManual}
+                          onChange={handleChange}
+                          placeholder="Deixe vazio pra usar o preço calculado"
+                        />
+                      </label>
+                    </div>
+
+                    {(form.custoMateriais || form.horasTrabalho || form.custosExtras) && (
+                      <div className="admin-pricing-preview">
+                        <div className="admin-pricing-preview-row">
+                          <span>
+                            Mão de obra ({form.horasTrabalho || 0}h × R${' '}
+                            {pricing?.valorHora || 25})
+                          </span>
+                          <strong>R$ {calcProduto.custoMaoDeObra.toFixed(2)}</strong>
+                        </div>
+                        <div className="admin-pricing-preview-row">
+                          <span>Custo total</span>
+                          <strong>R$ {calcProduto.custoTotal.toFixed(2)}</strong>
+                        </div>
+                        <div className="admin-pricing-preview-row">
+                          <span>Lucro ({form.margemLucro || 0}%)</span>
+                          <strong>R$ {calcProduto.lucro.toFixed(2)}</strong>
+                        </div>
+                        <div className="admin-pricing-preview-total">
+                          <span>💰 Preço final</span>
+                          <strong>R$ {calcProduto.precoFinal.toFixed(2)}</strong>
+                        </div>
                       </div>
                     )}
                   </div>
 
-                  <label className="admin-field admin-field-wide">
-                    <span>Descrição</span>
-                    <textarea
-                      rows="3"
-                      name="description"
-                      value={form.description}
-                      onChange={handleChange}
-                      placeholder="Descreva o produto..."
-                    />
-                  </label>
+                  <div className="admin-form-actions">
+                    <button
+                      type="submit"
+                      className="admin-btn-primary"
+                      disabled={enviandoImagem}
+                    >
+                      {editandoId ? '💾 Salvar alterações' : '➕ Adicionar produto'}
+                    </button>
 
-                  <label className="admin-check admin-field-wide">
-                    <input
-                      type="checkbox"
-                      name="featured"
-                      checked={form.featured}
-                      onChange={handleChange}
-                    />
-                    <span>⭐ Marcar como destaque</span>
-                  </label>
-                </div>
+                    {editandoId && (
+                      <button
+                        type="button"
+                        className="admin-btn-secundario"
+                        onClick={handleCancelarProduto}
+                      >
+                        Cancelar
+                      </button>
+                    )}
+                  </div>
+                </form>
+              </section>
 
-                {/* Precificação do produto */}
-                <div className="admin-pricing-section">
-                  <h3>💵 Precificação (só você vê)</h3>
-                  <p className="admin-pricing-subtitle">
-                    Preencha os custos e o sistema calcula o preço justo.
-                  </p>
-
-                  <div className="admin-grid">
-                    <label className="admin-field">
-                      <span>Custo dos materiais (R$)</span>
-                      <input
-                        type="number"
-                        step="0.01"
-                        name="custoMateriais"
-                        value={form.custoMateriais}
-                        onChange={handleChange}
-                        placeholder="Ex: 15.50"
-                      />
-                    </label>
-
-                    <label className="admin-field">
-                      <span>Horas de trabalho</span>
-                      <input
-                        type="number"
-                        step="0.1"
-                        name="horasTrabalho"
-                        value={form.horasTrabalho}
-                        onChange={handleChange}
-                        placeholder="Ex: 2"
-                      />
-                    </label>
-
-                    <label className="admin-field">
-                      <span>Custos extras (R$)</span>
-                      <input
-                        type="number"
-                        step="0.01"
-                        name="custosExtras"
-                        value={form.custosExtras}
-                        onChange={handleChange}
-                        placeholder="Embalagem, frete..."
-                      />
-                    </label>
-
-                    <label className="admin-field">
-                      <span>Margem de lucro (%)</span>
-                      <input
-                        type="number"
-                        step="1"
-                        name="margemLucro"
-                        value={form.margemLucro}
-                        onChange={handleChange}
-                        placeholder="Ex: 100"
-                      />
-                    </label>
-
-                    <label className="admin-field admin-field-wide">
-                      <span>Preço fixo (opcional)</span>
-                      <input
-                        type="number"
-                        step="0.01"
-                        name="precoManual"
-                        value={form.precoManual}
-                        onChange={handleChange}
-                        placeholder="Deixe vazio pra usar o preço calculado"
-                      />
-                    </label>
+              {/* Preview do produto */}
+              {mostrarPreview && (
+                <aside className="admin-preview-panel">
+                  <div className="admin-preview-header">
+                    <span className="admin-preview-badge">👁️ Preview</span>
+                    <small>Como vai aparecer no site</small>
                   </div>
 
-                  {(form.custoMateriais || form.horasTrabalho || form.custosExtras) && (
-                    <div className="admin-pricing-preview">
-                      <div className="admin-pricing-preview-row">
-                        <span>
-                          Mão de obra ({form.horasTrabalho || 0}h × R${' '}
-                          {pricing?.valorHora || 25})
-                        </span>
-                        <strong>R$ {calcProduto.custoMaoDeObra.toFixed(2)}</strong>
-                      </div>
-                      <div className="admin-pricing-preview-row">
-                        <span>Custo total</span>
-                        <strong>R$ {calcProduto.custoTotal.toFixed(2)}</strong>
-                      </div>
-                      <div className="admin-pricing-preview-row">
-                        <span>Lucro ({form.margemLucro || 0}%)</span>
-                        <strong>R$ {calcProduto.lucro.toFixed(2)}</strong>
-                      </div>
-                      <div className="admin-pricing-preview-total">
-                        <span>💰 Preço final</span>
-                        <strong>R$ {calcProduto.precoFinal.toFixed(2)}</strong>
-                      </div>
+                  <div className="admin-preview-cardwrap">
+                    <div className="admin-preview-label">
+                      <span>📱 No celular</span>
                     </div>
-                  )}
-                </div>
+                    <div className="admin-preview-phone">
+                      <ProductCard product={produtoPreview} />
+                    </div>
+                  </div>
 
-                <div className="admin-form-actions">
-                  <button
-                    type="submit"
-                    className="admin-btn-primary"
-                    disabled={enviandoImagem}
-                  >
-                    {editandoId ? '💾 Salvar alterações' : '➕ Adicionar produto'}
-                  </button>
-
-                  {editandoId && (
-                    <button
-                      type="button"
-                      className="admin-btn-secundario"
-                      onClick={handleCancelarProduto}
-                    >
-                      Cancelar
-                    </button>
-                  )}
-                </div>
-              </form>
-            </section>
+                  <div className="admin-preview-info">
+                    <p>💡 Preencha os campos e veja em tempo real como fica.</p>
+                  </div>
+                </aside>
+              )}
+            </div>
 
             <section className="admin-lista-section">
               <div className="admin-lista-head">
@@ -815,7 +862,6 @@ export function Admin() {
         {/* ================= ABA PRECIFICAÇÃO ================= */}
         {abaAtiva === 'precificacao' && (
           <>
-            {/* Valor da hora + Calculadora lado a lado */}
             <section className="admin-duo">
               <div className="admin-form-section admin-pricing-config">
                 <h2>⚙️ Valor da sua hora</h2>
@@ -862,7 +908,6 @@ export function Admin() {
               </div>
             </section>
 
-            {/* Calculadora de orçamento */}
             <section className="admin-form-section">
               <h2>🧮 Calculadora de orçamento</h2>
               <p className="admin-hint">
@@ -966,7 +1011,6 @@ export function Admin() {
                   </label>
                 </div>
 
-                {/* Preview do cálculo */}
                 {(orcamento.custoMateriais ||
                   orcamento.horasTrabalho ||
                   orcamento.custosExtras) && (
@@ -1008,7 +1052,6 @@ export function Admin() {
               </form>
             </section>
 
-            {/* Histórico */}
             <section className="admin-lista-section">
               <div className="admin-lista-head">
                 <h2>📋 Orçamentos salvos ({orcamentos.length})</h2>
