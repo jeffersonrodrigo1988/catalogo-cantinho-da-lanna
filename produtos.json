@@ -153,8 +153,8 @@
   "insumos": [
     {
       "nome": "Papel Sulfite",
-      "precoPacote": 15,
-      "quantidadePacote": 32,
+      "precoPacote": 32,
+      "quantidadePacote": 15,
       "unidade": "500",
       "id": "1790629118136"
     }
