@@ -4,7 +4,7 @@ import { Footer } from '../../components/Footer/Footer';
 import { MENSAGEM_SAUDACAO, WHATSAPP_NUMBER } from '../../config';
 import './Contato.css';
 
-const EMAIL = 'cantinhodalannaofficial@gmail.com';
+const EMAIL = 'cantinhodalannaoficial@gmail.com';
 const LINK_GMAIL = `https://mail.google.com/mail/?view=cm&fs=1&to=${EMAIL}&su=Contato%20-%20Cantinho%20da%20Lanna`;
 
 export function Contato() {

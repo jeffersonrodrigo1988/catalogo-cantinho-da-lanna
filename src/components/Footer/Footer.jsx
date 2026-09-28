@@ -5,6 +5,9 @@ import { useProducts } from '../../context/ProductsContext';
 import logo from '../../assets/cantinhodalanna.png';
 import './Footer.css';
 
+const EMAIL = 'cantinhodalannaoficial@gmail.com';
+const LINK_GMAIL = `https://mail.google.com/mail/?view=cm&fs=1&to=${EMAIL}&su=Contato%20-%20Cantinho%20da%20Lanna`;
+
 export function Footer() {
   const ano = new Date().getFullYear();
   const { categories } = useProducts();
@@ -55,7 +58,9 @@ export function Footer() {
               </svg>
             </button>
             <a
-              href="mailto:cantinhodalannaoficial@gmail.com"
+              href={LINK_GMAIL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="footer-social-btn"
               aria-label="E-mail"
             >
@@ -106,7 +111,7 @@ export function Footer() {
                 <rect x="2" y="4" width="20" height="16" rx="2"/>
                 <path d="m22 6-10 7L2 6"/>
               </svg>
-              <span>cantinhodalannaoficial@gmail.com</span>
+              <span>{EMAIL}</span>
             </li>
             <li>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
