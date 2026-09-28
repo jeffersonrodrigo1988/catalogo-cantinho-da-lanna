@@ -84,7 +84,7 @@ export function Contato() {
               </svg>
             </div>
             <h3>E-mail</h3>
-            <p>contato@cantinhodalanna.com</p>
+            <p>cantinhodalannaoficial@gmail.com</p>
             <a
               className="contato-card-btn"
               href="mailto:contato@cantinhodalanna.com"
@@ -164,7 +164,6 @@ export function Contato() {
             <span className="contato-horario-icone">💬</span>
             <div>
               <h3>Atendimento online</h3>
-              <p>Atendemos todo o Brasil</p>
               <p>Fale com a gente pelo WhatsApp</p>
             </div>
           </div>

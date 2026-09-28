@@ -9,11 +9,18 @@ const PRICING_PADRAO = {
   valorHora: 25,
 };
 
+const CUSTOS_FIXOS_PADRAO = {
+  itens: [],
+  horasPorMes: 160,
+};
+
 export function ProductsProvider({ children }) {
   const [products, setProducts] = useState([]);
   const [customCategories, setCustomCategories] = useState([]);
   const [pricing, setPricing] = useState(PRICING_PADRAO);
   const [orcamentos, setOrcamentos] = useState([]);
+  const [insumos, setInsumos] = useState([]);
+  const [custosFixos, setCustosFixos] = useState(CUSTOS_FIXOS_PADRAO);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,11 +39,15 @@ export function ProductsProvider({ children }) {
           setCustomCategories([]);
           setPricing(PRICING_PADRAO);
           setOrcamentos([]);
+          setInsumos([]);
+          setCustosFixos(CUSTOS_FIXOS_PADRAO);
         } else if (dados && typeof dados === 'object') {
           setProducts(dados.products || []);
           setCustomCategories(dados.categories || []);
           setPricing({ ...PRICING_PADRAO, ...(dados.pricing || {}) });
           setOrcamentos(dados.orcamentos || []);
+          setInsumos(dados.insumos || []);
+          setCustosFixos({ ...CUSTOS_FIXOS_PADRAO, ...(dados.custosFixos || {}) });
         }
       } catch (err) {
         console.error('Erro ao carregar:', err);
@@ -51,7 +62,9 @@ export function ProductsProvider({ children }) {
     novosProdutos,
     novasCategorias,
     novoPricing,
-    novosOrcamentos
+    novosOrcamentos,
+    novosInsumos,
+    novosCustosFixos
   ) {
     if (!isTauri()) return;
     try {
@@ -60,6 +73,8 @@ export function ProductsProvider({ children }) {
         pricing: novoPricing,
         products: novosProdutos,
         orcamentos: novosOrcamentos,
+        insumos: novosInsumos,
+        custosFixos: novosCustosFixos,
       };
       const jsonStr = JSON.stringify(dados, null, 2);
       await invoke('salvar_produtos_github', { produtosJson: jsonStr });
@@ -70,47 +85,56 @@ export function ProductsProvider({ children }) {
     }
   }
 
+  function sync(overrides = {}) {
+    sincronizar(
+      overrides.products ?? products,
+      overrides.categories ?? customCategories,
+      overrides.pricing ?? pricing,
+      overrides.orcamentos ?? orcamentos,
+      overrides.insumos ?? insumos,
+      overrides.custosFixos ?? custosFixos
+    );
+  }
+
   // === PRODUTOS ===
   function addProduct(product) {
     const novo = { ...product, id: String(Date.now()) };
-    const lista = [...products, novo];
-    setProducts(lista);
-    sincronizar(lista, customCategories, pricing, orcamentos);
+    setProducts([...products, novo]);
+    sync({ products: [...products, novo] });
   }
 
   function updateProduct(id, product) {
     const lista = products.map((p) => (p.id === id ? { ...product, id } : p));
     setProducts(lista);
-    sincronizar(lista, customCategories, pricing, orcamentos);
+    sync({ products: lista });
   }
 
   function removeProduct(id) {
     const lista = products.filter((p) => p.id !== id);
     setProducts(lista);
-    sincronizar(lista, customCategories, pricing, orcamentos);
+    sync({ products: lista });
   }
 
   // === CATEGORIAS ===
   function addCategory(nome) {
     const limpo = nome.trim();
-    if (!limpo) return;
-    if (customCategories.includes(limpo)) return;
+    if (!limpo || customCategories.includes(limpo)) return;
     const lista = [...customCategories, limpo];
     setCustomCategories(lista);
-    sincronizar(products, lista, pricing, orcamentos);
+    sync({ categories: lista });
   }
 
   function removeCategory(nome) {
     const lista = customCategories.filter((c) => c !== nome);
     setCustomCategories(lista);
-    sincronizar(products, lista, pricing, orcamentos);
+    sync({ categories: lista });
   }
 
   // === PRICING ===
   function atualizarPricing(novoPricing) {
     const atualizado = { ...pricing, ...novoPricing };
     setPricing(atualizado);
-    sincronizar(products, customCategories, atualizado, orcamentos);
+    sync({ pricing: atualizado });
   }
 
   // === ORÇAMENTOS ===
@@ -122,29 +146,62 @@ export function ProductsProvider({ children }) {
     };
     const lista = [novo, ...orcamentos];
     setOrcamentos(lista);
-    sincronizar(products, customCategories, pricing, lista);
+    sync({ orcamentos: lista });
     return novo;
   }
 
   function updateOrcamento(id, orcamento) {
     const lista = orcamentos.map((o) =>
       o.id === id
-        ? {
-            ...o,
-            ...orcamento,
-            id,
-            atualizadoEm: new Date().toISOString(),
-          }
+        ? { ...o, ...orcamento, id, atualizadoEm: new Date().toISOString() }
         : o
     );
     setOrcamentos(lista);
-    sincronizar(products, customCategories, pricing, lista);
+    sync({ orcamentos: lista });
   }
 
   function removeOrcamento(id) {
     const lista = orcamentos.filter((o) => o.id !== id);
     setOrcamentos(lista);
-    sincronizar(products, customCategories, pricing, lista);
+    sync({ orcamentos: lista });
+  }
+
+  // === INSUMOS (materiais) ===
+  function addInsumo(insumo) {
+    const novo = { ...insumo, id: String(Date.now()) };
+    const lista = [...insumos, novo];
+    setInsumos(lista);
+    sync({ insumos: lista });
+    return novo;
+  }
+
+  function updateInsumo(id, insumo) {
+    const lista = insumos.map((i) => (i.id === id ? { ...insumo, id } : i));
+    setInsumos(lista);
+    sync({ insumos: lista });
+  }
+
+  function removeInsumo(id) {
+    const lista = insumos.filter((i) => i.id !== id);
+    setInsumos(lista);
+    sync({ insumos: lista });
+  }
+
+  // === CUSTOS FIXOS ===
+  function atualizarCustosFixos(novos) {
+    const atualizado = { ...custosFixos, ...novos };
+    setCustosFixos(atualizado);
+    sync({ custosFixos: atualizado });
+  }
+
+  function addCustoFixo(item) {
+    const itens = [...custosFixos.itens, { ...item, id: String(Date.now()) }];
+    atualizarCustosFixos({ itens });
+  }
+
+  function removeCustoFixo(id) {
+    const itens = custosFixos.itens.filter((i) => i.id !== id);
+    atualizarCustosFixos({ itens });
   }
 
   const categoriesFromProducts = products.map((p) => p.category).filter(Boolean);
@@ -159,6 +216,8 @@ export function ProductsProvider({ children }) {
         customCategories,
         pricing,
         orcamentos,
+        insumos,
+        custosFixos,
         loading,
         addProduct,
         updateProduct,
@@ -169,6 +228,12 @@ export function ProductsProvider({ children }) {
         addOrcamento,
         updateOrcamento,
         removeOrcamento,
+        addInsumo,
+        updateInsumo,
+        removeInsumo,
+        atualizarCustosFixos,
+        addCustoFixo,
+        removeCustoFixo,
       }}
     >
       {children}

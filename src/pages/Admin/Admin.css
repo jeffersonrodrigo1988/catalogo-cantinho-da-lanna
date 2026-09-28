@@ -249,19 +249,6 @@
   color: var(--white);
 }
 
-/* ============ VALOR DA HORA + CALCULADORA LADO A LADO ============ */
-.admin-duo {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 1.5rem;
-  align-items: start;
-}
-
-.admin-duo .admin-pricing-config {
-  height: 100%;
-  margin: 0;
-}
-
 /* ============ CATEGORIAS ============ */
 .admin-hint {
   font-size: 0.88rem;
@@ -680,6 +667,29 @@
   letter-spacing: -0.5px;
 }
 
+/* ============ PRECIFICAÇÃO: ORÇAMENTO + CALCULADORA LADO A LADO ============ */
+.admin-precificacao-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.admin-precificacao-grid .admin-form-section {
+  margin: 0;
+}
+
+/* 🎯 Orçamento à esquerda, calculadora à direita */
+.admin-orcamento-section {
+  order: 1;
+}
+
+.admin-calc-section {
+  order: 2;
+  position: sticky;
+  top: 100px;
+}
+
 /* ============ LISTA ============ */
 .admin-lista-section {
   display: flex;
@@ -838,75 +848,46 @@
   color: #b8a8c0;
 }
 
-/* ============ RESPONSIVO ============ */
-@media (max-width: 900px) {
-  .admin-duo {
-    grid-template-columns: 1fr;
+.admin-orcamento-valorhora {
+  font-size: 0.78rem;
+  color: var(--pink-dark);
+  font-weight: 600;
+  background: var(--pink-soft);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  align-self: flex-start;
+  margin-top: 0.15rem;
+}
+
+/* ============ EDITANDO ORÇAMENTO ============ */
+.admin-editing-badge {
+  background: linear-gradient(135deg, #8b6bb8, #b89dd9);
+  color: var(--white);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(139, 107, 184, 0.3);
+  animation: admin-editing-pulse 2s infinite;
+}
+
+@keyframes admin-editing-pulse {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(139, 107, 184, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(139, 107, 184, 0.6);
   }
 }
 
-@media (max-width: 700px) {
-  .admin {
-    padding: 1.5rem 1rem;
-  }
-
-  .admin-head h1 {
-    font-size: 1.5rem;
-  }
-
-  .admin-head-actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .admin-tabs {
-    flex-direction: column;
-  }
-
-  .admin-tab {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .admin-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-form-section {
-    padding: 1.5rem;
-  }
-
-  .admin-item {
-    grid-template-columns: 60px 1fr;
-  }
-
-  .admin-item img {
-    width: 60px;
-    height: 60px;
-  }
-
-  .admin-item-acoes {
-    grid-column: 1 / -1;
-    justify-content: flex-end;
-  }
-
-  .admin-cat-add {
-    flex-direction: column;
-  }
-
-  .admin-pricing-config-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .admin-pricing-config-row .admin-field {
-    min-width: 100%;
-  }
-
-  .admin-orcamento-item {
-    grid-template-columns: 50px 1fr;
-  }
+.admin-orcamento-editando {
+  border: 2px solid var(--pink-dark) !important;
+  box-shadow: 0 8px 24px rgba(139, 107, 184, 0.25) !important;
+  background: linear-gradient(135deg, #f8f4ff 0%, #fff 100%) !important;
 }
+
 /* ============ FORM COM PREVIEW ============ */
 .admin-form-with-preview {
   display: grid;
@@ -997,7 +978,6 @@
   text-align: center;
 }
 
-/* Simulação de celular */
 .admin-preview-phone {
   width: 100%;
   max-width: 280px;
@@ -1008,7 +988,6 @@
   box-shadow: 0 8px 24px rgba(139, 107, 184, 0.15);
 }
 
-/* Reset dos estilos do card dentro do preview */
 .admin-preview-phone .product-card {
   box-shadow: var(--shadow-sm);
   border-radius: var(--radius);
@@ -1033,45 +1012,6 @@
   line-height: 1.5;
 }
 
-@media (max-width: 1000px) {
-  .admin-form-with-preview {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-preview-panel {
-    position: static;
-    max-width: 400px;
-    margin: 0 auto;
-  }
-}
-/* ============ EDITANDO ORÇAMENTO ============ */
-.admin-editing-badge {
-  background: linear-gradient(135deg, #8b6bb8, #b89dd9);
-  color: var(--white);
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.3rem 0.75rem;
-  border-radius: 999px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  box-shadow: 0 4px 12px rgba(139, 107, 184, 0.3);
-  animation: admin-editing-pulse 2s infinite;
-}
-
-@keyframes admin-editing-pulse {
-  0%, 100% {
-    box-shadow: 0 4px 12px rgba(139, 107, 184, 0.3);
-  }
-  50% {
-    box-shadow: 0 4px 20px rgba(139, 107, 184, 0.6);
-  }
-}
-
-.admin-orcamento-editando {
-  border: 2px solid var(--pink-dark) !important;
-  box-shadow: 0 8px 24px rgba(139, 107, 184, 0.25) !important;
-  background: linear-gradient(135deg, #f8f4ff 0%, #fff 100%) !important;
-}
 /* ============ MODAL DE EDIÇÃO DE ORÇAMENTO ============ */
 .orcamento-modal-overlay {
   position: fixed;
@@ -1200,7 +1140,94 @@
   border-top: 1px dashed rgba(201, 165, 232, 0.3);
 }
 
+/* ============ RESPONSIVO ============ */
+@media (max-width: 1000px) {
+  .admin-precificacao-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-calc-section {
+    position: static;
+    order: 0;
+  }
+
+  .admin-orcamento-section {
+    order: 1;
+  }
+
+  .admin-form-with-preview {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-preview-panel {
+    position: static;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}
+
 @media (max-width: 700px) {
+  .admin {
+    padding: 1.5rem 1rem;
+  }
+
+  .admin-head h1 {
+    font-size: 1.5rem;
+  }
+
+  .admin-head-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .admin-tabs {
+    flex-direction: column;
+  }
+
+  .admin-tab {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-form-section {
+    padding: 1.5rem;
+  }
+
+  .admin-item {
+    grid-template-columns: 60px 1fr;
+  }
+
+  .admin-item img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .admin-item-acoes {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+
+  .admin-cat-add {
+    flex-direction: column;
+  }
+
+  .admin-pricing-config-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-pricing-config-row .admin-field {
+    min-width: 100%;
+  }
+
+  .admin-orcamento-item {
+    grid-template-columns: 50px 1fr;
+  }
+
   .orcamento-modal-overlay {
     padding: 0;
     align-items: flex-end;
@@ -1232,5 +1259,402 @@
 
   .orcamento-modal-head h2 {
     font-size: 1.15rem;
+  }
+}
+/* ============ INSUMOS / MATERIAIS ============ */
+.admin-insumo-form {
+  display: grid;
+  grid-template-columns: 1fr 140px 180px auto auto;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.admin-insumo-form input {
+  border: 1.5px solid rgba(201, 165, 232, 0.3);
+  background: var(--cream);
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.92rem;
+  color: var(--brown);
+  outline: none;
+  transition: all var(--transition);
+  font-family: inherit;
+  width: 100%;
+}
+
+.admin-insumo-form input:focus {
+  border-color: var(--pink);
+  background: var(--white);
+  box-shadow: 0 0 0 4px rgba(201, 165, 232, 0.15);
+}
+
+.admin-insumos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-insumo-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  background: var(--cream);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(201, 165, 232, 0.15);
+  transition: all var(--transition);
+}
+
+.admin-insumo-item:hover {
+  border-color: var(--pink);
+  background: var(--pink-soft);
+}
+
+.admin-insumo-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.admin-insumo-info strong {
+  color: var(--brown);
+  font-size: 0.95rem;
+}
+
+.admin-insumo-preco {
+  font-size: 0.82rem;
+  color: var(--pink-dark);
+  font-weight: 600;
+}
+
+/* ============ CUSTOS FIXOS ============ */
+.admin-custosfixos-section {
+  background: linear-gradient(135deg, #f8f4ff 0%, #fff 100%);
+  border: 1.5px solid rgba(201, 165, 232, 0.3);
+}
+
+.admin-custosfixos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.admin-custofixo-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--white);
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(201, 165, 232, 0.15);
+}
+
+.admin-custofixo-nome {
+  flex: 1;
+  color: var(--brown);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.admin-custofixo-valor {
+  color: var(--pink-dark);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.admin-custosfixos-resumo {
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+  border: 1.5px dashed rgba(201, 165, 232, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-custosfixos-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.admin-custosfixos-row label {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.admin-custosfixos-row label span {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--brown);
+}
+
+.admin-custosfixos-row input {
+  border: 1.5px solid rgba(201, 165, 232, 0.3);
+  background: var(--cream);
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.92rem;
+  color: var(--brown);
+  outline: none;
+  transition: all var(--transition);
+  font-family: inherit;
+  width: 100%;
+}
+
+.admin-custosfixos-row input:focus {
+  border-color: var(--pink);
+  background: var(--white);
+  box-shadow: 0 0 0 4px rgba(201, 165, 232, 0.15);
+}
+
+.admin-custosfixos-total {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed rgba(201, 165, 232, 0.3);
+}
+
+.admin-custosfixos-total > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.admin-custosfixos-total span {
+  font-size: 0.78rem;
+  color: var(--gray);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-custosfixos-total strong {
+  font-size: 1.5rem;
+  color: var(--brown);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.admin-custofixo-hora {
+  color: var(--pink-dark) !important;
+}
+
+/* ============ SELECTOR DE MATERIAIS (usado em produto/orçamento) ============ */
+.admin-materiais {
+  background: var(--cream);
+  border: 1.5px dashed rgba(201, 165, 232, 0.4);
+  border-radius: var(--radius);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-materiais-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.admin-materiais-head > span {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--brown);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-materiais-select {
+  flex: 1;
+  min-width: 200px;
+  border: 1.5px solid rgba(201, 165, 232, 0.3);
+  background: var(--white);
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  color: var(--brown);
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition);
+}
+
+.admin-materiais-select:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 4px rgba(201, 165, 232, 0.15);
+}
+
+.admin-materiais-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.admin-material-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.75rem;
+  align-items: center;
+  background: var(--white);
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(201, 165, 232, 0.15);
+}
+
+.admin-material-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.admin-material-info strong {
+  color: var(--brown);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.admin-material-info small {
+  font-size: 0.75rem;
+  color: var(--gray);
+}
+
+.admin-material-qtd {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.admin-material-qtd input {
+  width: 80px;
+  border: 1.5px solid rgba(201, 165, 232, 0.3);
+  background: var(--cream);
+  padding: 0.5rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--brown);
+  outline: none;
+  text-align: center;
+  font-family: inherit;
+  transition: all var(--transition);
+}
+
+.admin-material-qtd input:focus {
+  border-color: var(--pink);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(201, 165, 232, 0.15);
+}
+
+.admin-material-subtotal {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--pink-dark);
+  min-width: 70px;
+  text-align: right;
+}
+
+.admin-material-remove {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--cream);
+  color: var(--gray);
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition);
+}
+
+.admin-material-remove:hover {
+  background: #ffe5e5;
+  color: #ff5c5c;
+}
+
+@media (max-width: 700px) {
+  .admin-insumo-form {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-custosfixos-total {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-material-item {
+    grid-template-columns: 1fr auto;
+  }
+
+  .admin-material-qtd {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+/* ============ INSUMO: PREVIEW DE PREÇO UNITÁRIO ============ */
+.admin-insumo-preview {
+  background: linear-gradient(135deg, #f8f4ff 0%, #fff 100%);
+  border: 1.5px dashed rgba(201, 165, 232, 0.4);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  font-size: 0.88rem;
+  color: var(--brown);
+  margin-bottom: 1.25rem;
+  text-align: center;
+}
+
+.admin-insumo-preview strong {
+  color: var(--pink-dark);
+  font-size: 1rem;
+}
+
+.admin-insumo-detalhe {
+  font-size: 0.78rem;
+  color: var(--gray);
+  font-weight: 500;
+}
+
+.admin-insumo-unitario {
+  font-size: 0.82rem;
+  color: var(--pink-dark);
+  font-weight: 700;
+  margin-top: 0.15rem;
+}
+
+/* ============ UNIDADE NO MATERIAL USADO ============ */
+.admin-material-unidade {
+  font-size: 0.75rem;
+  color: var(--gray);
+  font-weight: 600;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* Ajuste no grid do insumo (mais colunas) */
+.admin-insumo-form {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr auto auto;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .admin-insumo-form {
+    grid-template-columns: 1fr 1fr;
   }
 }
