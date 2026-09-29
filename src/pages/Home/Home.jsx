@@ -49,8 +49,8 @@ export function Home() {
             <span className="home-hero-destaque">Cantinho da Lanna</span>
           </h1>
           <p>
-            Mimos criados com carinho pra deixar seu dia
-            mais fofo e organizado.
+  
+  
           </p>
 
           <div className="home-hero-busca">

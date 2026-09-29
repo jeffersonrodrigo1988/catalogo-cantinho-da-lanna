@@ -47,8 +47,9 @@ export function Produtos() {
       <section className="produtos-hero">
         <div className="produtos-hero-content">
           <span className="produtos-hero-tag">✨ Novidades toda semana</span>
+          
           <h1>Nossos produtos</h1>
-          <p>Cadernos, canetas e mimos criados com carinho pra deixar seu dia mais fofo.</p>
+          <p></p>
         </div>
       </section>
 

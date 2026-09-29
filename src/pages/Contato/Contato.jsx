@@ -38,7 +38,7 @@ export function Contato() {
           <span className="contato-hero-tag">💌 Fale com a gente</span>
           <h1>
             Vamos conversar? <br />
-            <span className="contato-hero-destaque">Será um prazer 💕</span>
+            <span className="contato-hero-destaque">Será um prazer </span>
           </h1>
           <p>
             Tire dúvidas, faça encomendas personalizadas ou só mande um oi.
@@ -117,10 +117,7 @@ export function Contato() {
             </p>
 
             <ul className="contato-form-beneficios">
-              <li>
-                <span>⚡</span>
-                Resposta em até 1 hora
-              </li>
+              
               <li>
                 <span>🎨</span>
                 Orçamentos personalizados
@@ -169,15 +166,15 @@ export function Contato() {
             <span className="contato-horario-icone">🕐</span>
             <div>
               <h3>Horário de atendimento</h3>
-              <p>Segunda a sexta — 9h às 18h</p>
-              <p>Sábado — 9h às 13h</p>
+              <p>Segunda a sexta — 9h30 às 19h</p>
+              <p>Sábado — 9h30 às 14h</p>
             </div>
           </div>
           <div className="contato-horario-card">
             <span className="contato-horario-icone">💬</span>
             <div>
               <h3>Atendimento online</h3>
-              <p>Atendemos todo o Brasil</p>
+              
               <p>Fale com a gente pelo WhatsApp</p>
             </div>
           </div>
