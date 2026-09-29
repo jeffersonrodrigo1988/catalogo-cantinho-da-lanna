@@ -5,7 +5,8 @@ import { Calculadora } from '../../components/Calculadora/Calculadora';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
 import { useProducts } from '../../context/ProductsContext';
 import { useDialog } from '../../context/DialogContext';
-import { ADMIN_PASSWORD } from '../../config';
+import { ADMIN_HASH } from '../../config';
+import { verificarSenha } from '../../utils/auth';
 import { isTauri } from '../../utils/tauri';
 import './Admin.css';
 
@@ -281,7 +282,7 @@ export function Admin() {
 
   function handleLogin(e) {
     e.preventDefault();
-    if (senha === ADMIN_PASSWORD) {
+    if (verificarSenha(senha, ADMIN_HASH)) {
       setLogado(true);
       setErroSenha('');
       setSenha('');

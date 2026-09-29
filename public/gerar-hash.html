@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerar hash de senha</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #faf7fd;
+      color: #3d2b52;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .box {
+      background: #fff;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 16px 48px rgba(139, 107, 184, 0.18);
+      max-width: 600px;
+      width: 100%;
+    }
+    h1 { color: #8b6bb8; margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #c9a5e8;
+      border-radius: 10px;
+      font-size: 16px;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+    }
+    button {
+      background: #8b6bb8;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover { background: #b89dd9; }
+    pre {
+      background: #2a1d19;
+      color: #e8dcd6;
+      padding: 16px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 13px;
+      word-break: break-all;
+      white-space: pre-wrap;
+      margin-top: 20px;
+      display: none;
+    }
+    .copy-btn {
+      background: #25d366;
+      margin-top: 10px;
+      display: none;
+    }
+    .copy-btn:hover { background: #1ebe5b; }
+    .aviso {
+      background: #fff8e1;
+      border-left: 4px solid #f5a623;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>🔐 Gerar hash de senha</h1>
+
+    <div class="aviso">
+      <strong>Como usar:</strong> digite a senha do admin aqui, clique em gerar, e
+      copie o hash para colar no <code>src/config.js</code>. Depois pode apagar este
+      arquivo (ele só é usado uma vez).
+    </div>
+
+    <label>Digite a senha do admin:</label>
+    <input type="text" id="senha" placeholder="Ex: Lanna2025Forte!" />
+
+    <button onclick="gerar()">Gerar hash</button>
+
+    <pre id="resultado"></pre>
+    <button class="copy-btn" id="copiarBtn" onclick="copiar()">📋 Copiar hash</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+  <script>
+    function gerar() {
+      const senha = document.getElementById('senha').value;
+      if (!senha || senha.length < 4) {
+        alert('Digite uma senha com pelo menos 4 caracteres');
+        return;
+      }
+      const hash = bcrypt.hashSync(senha, 10);
+      document.getElementById('resultado').textContent = hash;
+      document.getElementById('resultado').style.display = 'block';
+      document.getElementById('copiarBtn').style.display = 'block';
+    }
+
+    function copiar() {
+      const texto = document.getElementById('resultado').textContent;
+      navigator.clipboard.writeText(texto).then(() => {
+        alert('✅ Hash copiado! Cole no config.js');
+      });
+    }
+  </script>
+</body>
+</html>
