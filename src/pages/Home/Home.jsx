@@ -43,14 +43,14 @@ export function Home() {
 
       <section className="home-hero">
         <div className="home-hero-content">
-          
+          <span className="home-hero-tag">🌸 Papelaria com amor</span>
           <h1>
             Bem-vinda ao <br />
             <span className="home-hero-destaque">Cantinho da Lanna</span>
           </h1>
           <p>
-  
-  
+            Cadernos, canetas e mimos criados com carinho pra deixar seu dia
+            mais fofo e organizado.
           </p>
 
           <div className="home-hero-busca">

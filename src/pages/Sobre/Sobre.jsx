@@ -3,6 +3,7 @@ import { Header } from '../../components/Header/Header';
 import { Footer } from '../../components/Footer/Footer';
 import { abrirWhatsApp } from '../../utils/whatsapp';
 import { MENSAGEM_SAUDACAO } from '../../config';
+import fotoLanna from '../../assets/sobre/lanna.jpeg';
 import './Sobre.css';
 
 export function Sobre() {
@@ -42,10 +43,7 @@ export function Sobre() {
           </div>
 
           <div className="sobre-historia-img">
-            <img
-              src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800"
-              alt="Papelaria criativa"
-            />
+            <img src={fotoLanna} alt="Cantinho da Lanna" />
           </div>
         </section>
 
