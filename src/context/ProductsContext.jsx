@@ -1,18 +1,27 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api/core';
 import { isTauri } from '../utils/tauri';
 import { carregarProdutosDoGithub } from '../utils/github';
 
 const ProductsContext = createContext(null);
 
-const PRICING_PADRAO = {
-  valorHora: 25,
-};
+const PRICING_PADRAO = { valorHora: 25 };
+const CUSTOS_FIXOS_PADRAO = { itens: [], horasPorMes: 160 };
 
-const CUSTOS_FIXOS_PADRAO = {
-  itens: [],
-  horasPorMes: 160,
-};
+const GITHUB_USER = 'jeffersonrodrigo1988';
+const GITHUB_REPO = 'catalogo-cantinho-da-lanna';
+const GITHUB_FILE_PATH = 'produtos.json';
+const TOKEN_KEY = 'cantinho-github-token';
+
+// 🎯 Carrega o invoke do Tauri de forma que o Vite NÃO tente resolver no build
+async function getTauriInvoke() {
+  try {
+    const nomeModulo = '@tauri-apps/api/core';
+    const mod = await import(/* @vite-ignore */ nomeModulo);
+    return mod.invoke;
+  } catch {
+    return null;
+  }
+}
 
 export function ProductsProvider({ children }) {
   const [products, setProducts] = useState([]);
@@ -28,6 +37,7 @@ export function ProductsProvider({ children }) {
       try {
         let dados;
         if (isTauri()) {
+          const invoke = await getTauriInvoke();
           const jsonStr = await invoke('carregar_produtos_github');
           dados = JSON.parse(jsonStr);
         } else {
@@ -36,11 +46,6 @@ export function ProductsProvider({ children }) {
 
         if (Array.isArray(dados)) {
           setProducts(dados);
-          setCustomCategories([]);
-          setPricing(PRICING_PADRAO);
-          setOrcamentos([]);
-          setInsumos([]);
-          setCustosFixos(CUSTOS_FIXOS_PADRAO);
         } else if (dados && typeof dados === 'object') {
           setProducts(dados.products || []);
           setCustomCategories(dados.categories || []);
@@ -58,6 +63,71 @@ export function ProductsProvider({ children }) {
     carregar();
   }, []);
 
+  async function salvarNoGithub(dados) {
+    const token = isTauri() ? null : localStorage.getItem(TOKEN_KEY);
+
+    if (isTauri()) {
+      try {
+        const invoke = await getTauriInvoke();
+        const jsonStr = JSON.stringify(dados, null, 2);
+        await invoke('salvar_produtos_github', { produtosJson: jsonStr });
+        console.log('✅ Salvo via Tauri!');
+        return;
+      } catch (err) {
+        console.error('❌ Erro Tauri:', err);
+        throw err;
+      }
+    }
+
+    if (!token) {
+      throw new Error('Token do GitHub não configurado. Vá em /admin e cole o token.');
+    }
+
+    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
+
+    let sha = null;
+    try {
+      const res = await fetch(url, {
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        sha = data.sha;
+      }
+    } catch (e) {
+      console.warn('Não conseguiu pegar SHA:', e);
+    }
+
+    const conteudo = JSON.stringify(dados, null, 2);
+    const emBase64 = btoa(unescape(encodeURIComponent(conteudo)));
+
+    const body = {
+      message: `Atualização do catálogo - ${new Date().toLocaleString('pt-BR')}`,
+      content: emBase64,
+      ...(sha && { sha }),
+    };
+
+    const res = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const erro = await res.text();
+      throw new Error(`Erro do GitHub: ${erro}`);
+    }
+
+    console.log('✅ Salvo via Chrome!');
+  }
+
   async function sincronizar(
     novosProdutos,
     novasCategorias,
@@ -66,7 +136,6 @@ export function ProductsProvider({ children }) {
     novosInsumos,
     novosCustosFixos
   ) {
-    if (!isTauri()) return;
     try {
       const dados = {
         categories: novasCategorias,
@@ -76,12 +145,10 @@ export function ProductsProvider({ children }) {
         insumos: novosInsumos,
         custosFixos: novosCustosFixos,
       };
-      const jsonStr = JSON.stringify(dados, null, 2);
-      await invoke('salvar_produtos_github', { produtosJson: jsonStr });
-      console.log('✅ Sincronizado!');
+      await salvarNoGithub(dados);
     } catch (err) {
       console.error('❌ Erro ao sincronizar:', err);
-      alert('Erro ao salvar: ' + err);
+      alert('Erro ao salvar: ' + err.message);
     }
   }
 
@@ -96,11 +163,11 @@ export function ProductsProvider({ children }) {
     );
   }
 
-  // === PRODUTOS ===
   function addProduct(product) {
     const novo = { ...product, id: String(Date.now()) };
-    setProducts([...products, novo]);
-    sync({ products: [...products, novo] });
+    const lista = [...products, novo];
+    setProducts(lista);
+    sync({ products: lista });
   }
 
   function updateProduct(id, product) {
@@ -115,7 +182,6 @@ export function ProductsProvider({ children }) {
     sync({ products: lista });
   }
 
-  // === CATEGORIAS ===
   function addCategory(nome) {
     const limpo = nome.trim();
     if (!limpo || customCategories.includes(limpo)) return;
@@ -130,14 +196,12 @@ export function ProductsProvider({ children }) {
     sync({ categories: lista });
   }
 
-  // === PRICING ===
   function atualizarPricing(novoPricing) {
     const atualizado = { ...pricing, ...novoPricing };
     setPricing(atualizado);
     sync({ pricing: atualizado });
   }
 
-  // === ORÇAMENTOS ===
   function addOrcamento(orcamento) {
     const novo = {
       ...orcamento,
@@ -152,9 +216,7 @@ export function ProductsProvider({ children }) {
 
   function updateOrcamento(id, orcamento) {
     const lista = orcamentos.map((o) =>
-      o.id === id
-        ? { ...o, ...orcamento, id, atualizadoEm: new Date().toISOString() }
-        : o
+      o.id === id ? { ...o, ...orcamento, id, atualizadoEm: new Date().toISOString() } : o
     );
     setOrcamentos(lista);
     sync({ orcamentos: lista });
@@ -166,7 +228,6 @@ export function ProductsProvider({ children }) {
     sync({ orcamentos: lista });
   }
 
-  // === INSUMOS (materiais) ===
   function addInsumo(insumo) {
     const novo = { ...insumo, id: String(Date.now()) };
     const lista = [...insumos, novo];
@@ -187,7 +248,6 @@ export function ProductsProvider({ children }) {
     sync({ insumos: lista });
   }
 
-  // === CUSTOS FIXOS ===
   function atualizarCustosFixos(novos) {
     const atualizado = { ...custosFixos, ...novos };
     setCustosFixos(atualizado);

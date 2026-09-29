@@ -128,8 +128,6 @@ async fn carregar_produtos_github() -> Result<String, String> {
     }
 }
 
-/// Faz upload de uma imagem para o GitHub na pasta "imagens/"
-/// Retorna a URL pública da imagem
 #[tauri::command]
 async fn upload_imagem_github(nome_arquivo: String, dados_base64: String) -> Result<String, String> {
     let token = get_token();
@@ -137,13 +135,11 @@ async fn upload_imagem_github(nome_arquivo: String, dados_base64: String) -> Res
         return Err("Token não configurado no arquivo .env".to_string());
     }
 
-    // Limpa o nome do arquivo (remove caracteres especiais)
     let nome_limpo: String = nome_arquivo
         .chars()
         .map(|c| if c.is_alphanumeric() || c == '.' || c == '-' || c == '_' { c } else { '_' })
         .collect();
 
-    // Cria nome único com timestamp
     let timestamp = chrono::Local::now().timestamp();
     let extensao = nome_limpo.split('.').last().unwrap_or("png").to_lowercase();
     let path = format!("imagens/{}-{}.{}", timestamp, timestamp, extensao);
@@ -154,7 +150,6 @@ async fn upload_imagem_github(nome_arquivo: String, dados_base64: String) -> Res
         GITHUB_USER, GITHUB_REPO, path
     );
 
-    // Remove prefixo data:image/...;base64, se existir
     let base64_limpo = if dados_base64.contains(",") {
         dados_base64.split(',').nth(1).unwrap_or(&dados_base64).to_string()
     } else {
@@ -189,12 +184,10 @@ async fn upload_imagem_github(nome_arquivo: String, dados_base64: String) -> Res
     }
 }
 
-#[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let _ = dotenvy::dotenv();
 
     tauri::Builder::default()
-        .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             salvar_produtos_github,
             carregar_produtos_github,

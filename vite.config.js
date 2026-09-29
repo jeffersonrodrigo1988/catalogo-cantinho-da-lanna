@@ -11,4 +11,13 @@ export default defineConfig({
       ignored: ['**/src-tauri/**'],
     },
   },
+  build: {
+    target: 'esnext',
+    rollupOptions: {
+      external: ['@tauri-apps/api/core', '@tauri-apps/api', '@tauri-apps/plugin-opener'],
+    },
+  },
+  optimizeDeps: {
+    exclude: ['@tauri-apps/api/core'],
+  },
 });

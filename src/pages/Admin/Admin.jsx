@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { invoke } from '@tauri-apps/api/core';
 import { Header } from '../../components/Header/Header';
 import { Calculadora } from '../../components/Calculadora/Calculadora';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
@@ -51,8 +50,8 @@ const CUSTO_FIXO_VAZIO = {
 };
 
 const STORAGE_KEY = 'cantinho-admin-logado';
+const TOKEN_KEY = 'cantinho-github-token';
 
-// Calcula o preço unitário de um insumo
 function precoUnitario(insumo) {
   if (!insumo) return 0;
   const preco = parseFloat(insumo.precoPacote) || 0;
@@ -72,6 +71,14 @@ export function Admin() {
   const [senha, setSenha] = useState('');
   const [erroSenha, setErroSenha] = useState('');
   const [abaAtiva, setAbaAtiva] = useState('produtos');
+
+  // Token (só pra Chrome/navegador)
+  const [tokenInput, setTokenInput] = useState('');
+  const [precisaToken, setPrecisaToken] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    if (isTauri()) return false;
+    return !localStorage.getItem(TOKEN_KEY);
+  });
 
   const {
     products,
@@ -164,23 +171,50 @@ export function Admin() {
     return () => window.removeEventListener('keydown', handleEsc);
   }, [modalOrcamentoAberto]);
 
-  if (!isTauri()) {
+  // === TELA DE TOKEN (só no navegador, primeira vez) ===
+  if (precisaToken) {
     return (
       <>
         <Header />
-        <main className="admin-bloqueado">
-          <div className="admin-bloqueado-box">
-            <span className="admin-bloqueado-emoji">🔒</span>
-            <h1>Área restrita</h1>
+        <main className="admin-login">
+          <form
+            className="admin-login-box"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const t = tokenInput.trim();
+              if (!t || !t.startsWith('gh')) {
+                notificar('Token inválido. Precisa começar com "gh"', 'erro');
+                return;
+              }
+              localStorage.setItem(TOKEN_KEY, t);
+              setPrecisaToken(false);
+              notificar('Token salvo! Bem-vinda 💜', 'sucesso');
+            }}
+          >
+            <span className="admin-login-emoji">🔑</span>
+            <h1>Token do GitHub</h1>
             <p>
-              O painel admin só funciona no aplicativo do PC.
+              Cole seu token pra autorizar este PC.
               <br />
-              Aqui no site você só pode visualizar o catálogo. 💕
+              <small>(Só precisa fazer isso uma vez)</small>
             </p>
-            <Link to="/" className="admin-btn-primary">
-              Voltar ao catálogo
+
+            <input
+              type="password"
+              placeholder="github_pat_..."
+              value={tokenInput}
+              onChange={(e) => setTokenInput(e.target.value)}
+              autoFocus
+            />
+
+            <button type="submit" className="admin-btn-primary">
+              Salvar token
+            </button>
+
+            <Link to="/" className="admin-login-voltar">
+              ← Voltar ao catálogo
             </Link>
-          </div>
+          </form>
         </main>
       </>
     );
@@ -294,6 +328,11 @@ export function Admin() {
     const arquivos = Array.from(e.target.files || []);
     if (arquivos.length === 0) return;
 
+    if (!isTauri()) {
+      notificar('Upload de imagem só funciona no app do PC', 'aviso');
+      return;
+    }
+
     setEnviandoImagem(true);
     notificar('Enviando imagens...', 'info');
 
@@ -307,11 +346,12 @@ export function Admin() {
         }
 
         const base64 = await arquivoParaBase64(arquivo);
-        const url = await invoke('upload_imagem_github', {
-          nomeArquivo: arquivo.name,
-          dadosBase64: base64,
-        });
-        novasUrls.push(url);
+const { invoke } = await import(/* @vite-ignore */ '@tauri-apps/api/core');
+const url = await invoke('upload_imagem_github', {
+  nomeArquivo: arquivo.name,
+  dadosBase64: base64,
+});
+novasUrls.push(url);
       }
 
       setForm((prev) => ({
@@ -716,9 +756,7 @@ export function Admin() {
                         onChange(target, idx, 'quantidade', e.target.value)
                       }
                     />
-                    <span className="admin-material-unidade">
-                      {insumo.unidade}
-                    </span>
+                    <span className="admin-material-unidade">{insumo.unidade}</span>
                     <span className="admin-material-subtotal">
                       R$ {subtotal.toFixed(2)}
                     </span>
@@ -914,9 +952,7 @@ export function Admin() {
                             <div key={i} className="admin-image-item">
                               <img src={url} alt={`Foto ${i + 1}`} />
                               {i === 0 && (
-                                <span className="admin-image-principal">
-                                  Principal
-                                </span>
+                                <span className="admin-image-principal">Principal</span>
                               )}
                               <button
                                 type="button"
@@ -1038,17 +1074,13 @@ export function Admin() {
                         {calcProduto.custoInsumos > 0 && (
                           <div className="admin-pricing-preview-row">
                             <span>🧾 Materiais</span>
-                            <strong>
-                              R$ {calcProduto.custoInsumos.toFixed(2)}
-                            </strong>
+                            <strong>R$ {calcProduto.custoInsumos.toFixed(2)}</strong>
                           </div>
                         )}
                         {calcProduto.custoManual > 0 && (
                           <div className="admin-pricing-preview-row">
                             <span>Custo manual</span>
-                            <strong>
-                              R$ {calcProduto.custoManual.toFixed(2)}
-                            </strong>
+                            <strong>R$ {calcProduto.custoManual.toFixed(2)}</strong>
                           </div>
                         )}
                         <div className="admin-pricing-preview-row">
@@ -1057,15 +1089,12 @@ export function Admin() {
                             {calcProduto.valorHora.toFixed(2)}
                             {calcProduto.custoFixoPorHora > 0 && (
                               <small>
-                                {' '}
-                                · inclui R$ {calcProduto.custoFixoPorHora.toFixed(2)}/h fixo
+                                {' '}· inclui R$ {calcProduto.custoFixoPorHora.toFixed(2)}/h fixo
                               </small>
                             )}
                             )
                           </span>
-                          <strong>
-                            R$ {calcProduto.custoMaoDeObra.toFixed(2)}
-                          </strong>
+                          <strong>R$ {calcProduto.custoMaoDeObra.toFixed(2)}</strong>
                         </div>
                         <div className="admin-pricing-preview-row">
                           <span>Custo total</span>
@@ -1162,9 +1191,7 @@ export function Admin() {
                             </span>
                           )}
                           {p.featured && (
-                            <span className="admin-item-destaque">
-                              ✨ Destaque
-                            </span>
+                            <span className="admin-item-destaque">✨ Destaque</span>
                           )}
                         </div>
 
@@ -1308,10 +1335,7 @@ export function Admin() {
                   placeholder="Preço da embalagem (R$)"
                   value={novoInsumo.precoPacote}
                   onChange={(e) =>
-                    setNovoInsumo((prev) => ({
-                      ...prev,
-                      precoPacote: e.target.value,
-                    }))
+                    setNovoInsumo((prev) => ({ ...prev, precoPacote: e.target.value }))
                   }
                 />
                 <input
@@ -1320,10 +1344,7 @@ export function Admin() {
                   placeholder="Qtd por embalagem (ex: 500)"
                   value={novoInsumo.quantidadePacote}
                   onChange={(e) =>
-                    setNovoInsumo((prev) => ({
-                      ...prev,
-                      quantidadePacote: e.target.value,
-                    }))
+                    setNovoInsumo((prev) => ({ ...prev, quantidadePacote: e.target.value }))
                   }
                 />
                 <input
@@ -1367,9 +1388,7 @@ export function Admin() {
               )}
 
               {insumos.length === 0 ? (
-                <p className="admin-vazio">
-                  Nenhum material cadastrado ainda 😢
-                </p>
+                <p className="admin-vazio">Nenhum material cadastrado ainda 😢</p>
               ) : (
                 <div className="admin-insumos-lista">
                   {insumos.map((i) => {
@@ -1600,17 +1619,13 @@ export function Admin() {
                       {calcOrcamento.custoInsumos > 0 && (
                         <div className="admin-pricing-preview-row">
                           <span>🧾 Materiais</span>
-                          <strong>
-                            R$ {calcOrcamento.custoInsumos.toFixed(2)}
-                          </strong>
+                          <strong>R$ {calcOrcamento.custoInsumos.toFixed(2)}</strong>
                         </div>
                       )}
                       {calcOrcamento.custoManual > 0 && (
                         <div className="admin-pricing-preview-row">
                           <span>Custo manual</span>
-                          <strong>
-                            R$ {calcOrcamento.custoManual.toFixed(2)}
-                          </strong>
+                          <strong>R$ {calcOrcamento.custoManual.toFixed(2)}</strong>
                         </div>
                       )}
                       <div className="admin-pricing-preview-row">
@@ -1619,15 +1634,12 @@ export function Admin() {
                           {calcOrcamento.valorHora.toFixed(2)}
                           {calcOrcamento.custoFixoPorHora > 0 && (
                             <small>
-                              {' '}
-                              · inclui R$ {calcOrcamento.custoFixoPorHora.toFixed(2)}/h fixo
+                              {' '}· inclui R$ {calcOrcamento.custoFixoPorHora.toFixed(2)}/h fixo
                             </small>
                           )}
                           )
                         </span>
-                        <strong>
-                          R$ {calcOrcamento.custoMaoDeObra.toFixed(2)}
-                        </strong>
+                        <strong>R$ {calcOrcamento.custoMaoDeObra.toFixed(2)}</strong>
                       </div>
                       <div className="admin-pricing-preview-row">
                         <span>Custo total</span>
@@ -1674,9 +1686,7 @@ export function Admin() {
               </div>
 
               {orcamentos.length === 0 ? (
-                <p className="admin-vazio">
-                  Nenhum orçamento salvo ainda 😢
-                </p>
+                <p className="admin-vazio">Nenhum orçamento salvo ainda 😢</p>
               ) : (
                 <div className="admin-lista">
                   {orcamentos.map((o) => (
@@ -1881,17 +1891,13 @@ export function Admin() {
                     {calcOrcamento.custoInsumos > 0 && (
                       <div className="admin-pricing-preview-row">
                         <span>🧾 Materiais</span>
-                        <strong>
-                          R$ {calcOrcamento.custoInsumos.toFixed(2)}
-                        </strong>
+                        <strong>R$ {calcOrcamento.custoInsumos.toFixed(2)}</strong>
                       </div>
                     )}
                     {calcOrcamento.custoManual > 0 && (
                       <div className="admin-pricing-preview-row">
                         <span>Custo manual</span>
-                        <strong>
-                          R$ {calcOrcamento.custoManual.toFixed(2)}
-                        </strong>
+                        <strong>R$ {calcOrcamento.custoManual.toFixed(2)}</strong>
                       </div>
                     )}
                     <div className="admin-pricing-preview-row">
@@ -1900,15 +1906,12 @@ export function Admin() {
                         {calcOrcamento.valorHora.toFixed(2)}
                         {calcOrcamento.custoFixoPorHora > 0 && (
                           <small>
-                            {' '}
-                            · inclui R$ {calcOrcamento.custoFixoPorHora.toFixed(2)}/h fixo
+                            {' '}· inclui R$ {calcOrcamento.custoFixoPorHora.toFixed(2)}/h fixo
                           </small>
                         )}
                         )
                       </span>
-                      <strong>
-                        R$ {calcOrcamento.custoMaoDeObra.toFixed(2)}
-                      </strong>
+                      <strong>R$ {calcOrcamento.custoMaoDeObra.toFixed(2)}</strong>
                     </div>
                     <div className="admin-pricing-preview-row">
                       <span>Custo total</span>
