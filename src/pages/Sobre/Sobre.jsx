@@ -31,10 +31,20 @@ export function Sobre() {
             <span className="sobre-label">Sobre nós</span>
             <h2>Quem somos 🌸</h2>
             <p>
-              Somos uma papelaria criativa que acredita que pequenos detalhes
-              transformam o cotidiano. Cada caderno, caneta e item
-              personalizado é escolhido pensando em você — que ama papelaria
-              e quer deixar tudo mais bonito.
+              Me chamo Lannara, mas pode me chamar de Lanna. Antes, trabalhava como CLT, 
+              mas larguei tudo para cuidar da minha filha. Eu e meu esposo ficamos desempregados e,
+               entre muitas tentativas, descobri a papelaria.
+                Meu primeiro topo de bolo foi para o aniversário da minha filha—feito com sulfite, 
+                palito de churrasco e uma arte da internet. Quem diria que, dali, nasceria minha paixão!
+
+                Com o apoio do meu esposo, mergulhei de cabeça nesse universo e, 
+                juntos, criamos o Cantinho da Lanna Oficial. Foi a melhor escolha que fiz! Hoje, 
+                sou artesã com orgulho, transformando papel em emoção e sonhos em realidade.
+                Nem sempre é fácil equilibrar a vida de empreendedora, mãe,
+                esposa e dona de casa, mas não trocaria isso por nada. 
+                Cada peça que crio carrega carinho,
+                dedicação e a certeza de que estou no caminho certo.
+                "Detalhes em papel, memórias para a vida!"
             </p>
             <p>
               Do Cantinho da Lanna saem presentes fofos, kits escolares e
