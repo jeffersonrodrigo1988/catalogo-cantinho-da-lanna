@@ -72,7 +72,6 @@ export function Admin() {
   const [erroSenha, setErroSenha] = useState('');
   const [abaAtiva, setAbaAtiva] = useState('produtos');
 
-  // Token (só pra Chrome/navegador)
   const [tokenInput, setTokenInput] = useState('');
   const [precisaToken, setPrecisaToken] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -102,6 +101,7 @@ export function Admin() {
     atualizarCustosFixos,
     addCustoFixo,
     removeCustoFixo,
+    uploadImagem,
   } = useProducts();
 
   const [form, setForm] = useState(FORM_VAZIO);
@@ -201,7 +201,7 @@ export function Admin() {
 
             <input
               type="password"
-              placeholder="github_pat_..."
+              placeholder="ghp_... ou github_pat_..."
               value={tokenInput}
               onChange={(e) => setTokenInput(e.target.value)}
               autoFocus
@@ -328,11 +328,6 @@ export function Admin() {
     const arquivos = Array.from(e.target.files || []);
     if (arquivos.length === 0) return;
 
-    if (!isTauri()) {
-      notificar('Upload de imagem só funciona no app do PC', 'aviso');
-      return;
-    }
-
     setEnviandoImagem(true);
     notificar('Enviando imagens...', 'info');
 
@@ -346,12 +341,8 @@ export function Admin() {
         }
 
         const base64 = await arquivoParaBase64(arquivo);
-const { invoke } = await import(/* @vite-ignore */ '@tauri-apps/api/core');
-const url = await invoke('upload_imagem_github', {
-  nomeArquivo: arquivo.name,
-  dadosBase64: base64,
-});
-novasUrls.push(url);
+        const url = await uploadImagem(arquivo.name, base64);
+        novasUrls.push(url);
       }
 
       setForm((prev) => ({
@@ -362,7 +353,7 @@ novasUrls.push(url);
       notificar(`${novasUrls.length} imagem(ns) enviada(s)!`, 'sucesso');
     } catch (err) {
       console.error('Erro no upload:', err);
-      notificar('Erro ao enviar imagem: ' + err, 'erro');
+      notificar('Erro ao enviar imagem: ' + err.message, 'erro');
     } finally {
       setEnviandoImagem(false);
       e.target.value = '';

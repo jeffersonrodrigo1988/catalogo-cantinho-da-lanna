@@ -12,13 +12,14 @@ const GITHUB_REPO = 'catalogo-cantinho-da-lanna';
 const GITHUB_FILE_PATH = 'produtos.json';
 const TOKEN_KEY = 'cantinho-github-token';
 
-async function getTauriInvoke() {
-  try {
-    const mod = await import(/* @vite-ignore */ '@tauri-apps/api/core');
-    return mod.invoke;
-  } catch {
-    return null;
+// 🎯 Chama o invoke do Tauri SEM import (evita erro do Vite)
+async function invokeTauri(cmd, args) {
+  const internals = window.__TAURI_INTERNALS__;
+  if (!internals) {
+    throw new Error('Tauri não disponível');
   }
+  // Tauri v2 expõe invoke em __TAURI_INTERNALS__.invoke
+  return await internals.invoke(cmd, args);
 }
 
 export function ProductsProvider({ children }) {
@@ -35,8 +36,7 @@ export function ProductsProvider({ children }) {
       try {
         let dados;
         if (isTauri()) {
-          const invoke = await getTauriInvoke();
-          const jsonStr = await invoke('carregar_produtos_github');
+          const jsonStr = await invokeTauri('carregar_produtos_github');
           dados = JSON.parse(jsonStr);
         } else {
           dados = await carregarProdutosDoGithub();
@@ -66,9 +66,8 @@ export function ProductsProvider({ children }) {
 
     if (isTauri()) {
       try {
-        const invoke = await getTauriInvoke();
         const jsonStr = JSON.stringify(dados, null, 2);
-        await invoke('salvar_produtos_github', { produtosJson: jsonStr });
+        await invokeTauri('salvar_produtos_github', { produtosJson: jsonStr });
         console.log('✅ Salvo via Tauri!');
         return;
       } catch (err) {
@@ -161,17 +160,15 @@ export function ProductsProvider({ children }) {
     );
   }
 
-  // 🎯 NOVA FUNÇÃO: Upload de imagem via Chrome
+  // 🎯 Upload de imagem (Tauri via invokeTauri, Chrome via fetch)
   async function uploadImagem(nomeArquivo, dadosBase64) {
     if (isTauri()) {
-      const invoke = await getTauriInvoke();
-      return await invoke('upload_imagem_github', {
+      return await invokeTauri('upload_imagem_github', {
         nomeArquivo,
         dadosBase64,
       });
     }
 
-    // Modo Chrome: upload via API do GitHub
     const token = localStorage.getItem(TOKEN_KEY);
     if (!token) {
       throw new Error('Token não configurado. Vá em /admin e cole o token.');
