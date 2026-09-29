@@ -12,11 +12,9 @@ const GITHUB_REPO = 'catalogo-cantinho-da-lanna';
 const GITHUB_FILE_PATH = 'produtos.json';
 const TOKEN_KEY = 'cantinho-github-token';
 
-// 🎯 Carrega o invoke do Tauri de forma que o Vite NÃO tente resolver no build
 async function getTauriInvoke() {
   try {
-    const nomeModulo = '@tauri-apps/api/core';
-    const mod = await import(/* @vite-ignore */ nomeModulo);
+    const mod = await import(/* @vite-ignore */ '@tauri-apps/api/core');
     return mod.invoke;
   } catch {
     return null;
@@ -80,7 +78,7 @@ export function ProductsProvider({ children }) {
     }
 
     if (!token) {
-      throw new Error('Token do GitHub não configurado. Vá em /admin e cole o token.');
+      throw new Error('Token do GitHub não configurado.');
     }
 
     const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
@@ -161,6 +159,56 @@ export function ProductsProvider({ children }) {
       overrides.insumos ?? insumos,
       overrides.custosFixos ?? custosFixos
     );
+  }
+
+  // 🎯 NOVA FUNÇÃO: Upload de imagem via Chrome
+  async function uploadImagem(nomeArquivo, dadosBase64) {
+    if (isTauri()) {
+      const invoke = await getTauriInvoke();
+      return await invoke('upload_imagem_github', {
+        nomeArquivo,
+        dadosBase64,
+      });
+    }
+
+    // Modo Chrome: upload via API do GitHub
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) {
+      throw new Error('Token não configurado. Vá em /admin e cole o token.');
+    }
+
+    const nomeLimpo = nomeArquivo.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const timestamp = Date.now();
+    const extensao = nomeLimpo.split('.').pop().toLowerCase() || 'png';
+    const path = `imagens/${timestamp}-${timestamp}.${extensao}`;
+
+    const base64Limpo = dadosBase64.includes(',')
+      ? dadosBase64.split(',')[1]
+      : dadosBase64;
+
+    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`;
+
+    const body = {
+      message: `Upload de imagem - ${new Date().toLocaleString('pt-BR')}`,
+      content: base64Limpo,
+    };
+
+    const res = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const erro = await res.text();
+      throw new Error(`Erro no upload: ${erro}`);
+    }
+
+    return `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${path}`;
   }
 
   function addProduct(product) {
@@ -294,6 +342,7 @@ export function ProductsProvider({ children }) {
         atualizarCustosFixos,
         addCustoFixo,
         removeCustoFixo,
+        uploadImagem,
       }}
     >
       {children}
