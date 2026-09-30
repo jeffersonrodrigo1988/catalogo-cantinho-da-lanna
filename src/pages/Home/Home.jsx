@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Header } from '../../components/Header/Header';
 import { Footer } from '../../components/Footer/Footer';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
+import { SkeletonGrid } from '../../components/SkeletonCard/SkeletonCard';
 import { useProducts } from '../../context/ProductsContext';
 import adesivoImg from '../../assets/categorias/adesivo.png';
 import calendarioImg from '../../assets/categorias/calendario.png';
@@ -22,7 +23,7 @@ const categoriasDestaque = [
 ];
 
 export function Home() {
-  const { products } = useProducts();
+  const { products, loading } = useProducts();
   const [search, setSearch] = useState('');
 
   const destaques = useMemo(
@@ -123,11 +124,15 @@ export function Home() {
           </Link>
         </div>
 
-        <div className="home-grid">
-          {destaques.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
+        {loading ? (
+          <SkeletonGrid count={4} />
+        ) : (
+          <div className="home-grid">
+            {destaques.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="home-cta">

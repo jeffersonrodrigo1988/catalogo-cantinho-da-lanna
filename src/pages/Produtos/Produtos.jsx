@@ -3,16 +3,16 @@ import { useSearchParams } from 'react-router-dom';
 import { Header } from '../../components/Header/Header';
 import { Footer } from '../../components/Footer/Footer';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
+import { SkeletonGrid } from '../../components/SkeletonCard/SkeletonCard';
 import { useProducts } from '../../context/ProductsContext';
 import './Produtos.css';
 
 export function Produtos() {
-  const { products, categories } = useProducts();
+  const { products, categories, loading } = useProducts();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('Todos');
 
-  // 🎯 Lê a categoria da URL quando a página abre
   useEffect(() => {
     const cat = searchParams.get('cat');
     if (cat && categories.includes(cat)) {
@@ -22,7 +22,6 @@ export function Produtos() {
     }
   }, [searchParams, categories]);
 
-  // 🎯 Quando clica numa categoria, atualiza a URL também
   function handleSelecionarCategoria(novaCategoria) {
     setCategory(novaCategoria);
     if (novaCategoria === 'Todos') {
@@ -47,9 +46,8 @@ export function Produtos() {
       <section className="produtos-hero">
         <div className="produtos-hero-content">
           <span className="produtos-hero-tag">✨ Novidades toda semana</span>
-          
           <h1>Nossos produtos</h1>
-          <p></p>
+          <p>Cadernos, canetas e mimos criados com carinho pra deixar seu dia mais fofo.</p>
         </div>
       </section>
 
@@ -101,13 +99,21 @@ export function Produtos() {
         <section className="produtos-main">
           <div className="produtos-toolbar">
             <p className="produtos-count">
-              <strong>{filtered.length}</strong> produto{filtered.length !== 1 ? 's' : ''} encontrado{filtered.length !== 1 ? 's' : ''}
-              {category !== 'Todos' && (
-                <> em <strong>{category}</strong></>
+              {loading ? (
+                <>Carregando produtos...</>
+              ) : (
+                <>
+                  <strong>{filtered.length}</strong> produto
+                  {filtered.length !== 1 ? 's' : ''} encontrado
+                  {filtered.length !== 1 ? 's' : ''}
+                  {category !== 'Todos' && (
+                    <> em <strong>{category}</strong></>
+                  )}
+                </>
               )}
             </p>
 
-            {category !== 'Todos' && (
+            {category !== 'Todos' && !loading && (
               <button
                 className="produtos-limpar-filtro"
                 onClick={() => handleSelecionarCategoria('Todos')}
@@ -117,7 +123,9 @@ export function Produtos() {
             )}
           </div>
 
-          {filtered.length > 0 ? (
+          {loading ? (
+            <SkeletonGrid count={8} />
+          ) : filtered.length > 0 ? (
             <div className="produtos-grid">
               {filtered.map((p) => (
                 <ProductCard key={p.id} product={p} />
