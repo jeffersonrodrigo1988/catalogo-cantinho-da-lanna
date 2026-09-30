@@ -27,7 +27,7 @@ export function Footer() {
             <img src={logo} alt={LOJA_NOME} />
             <div>
               <h3>{LOJA_NOME}</h3>
-              <p>Papelaria & Presentes</p>
+              
             </div>
           </div>
           <p className="footer-desc">
