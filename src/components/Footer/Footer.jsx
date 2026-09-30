@@ -118,7 +118,7 @@ export function Footer() {
                 <circle cx="12" cy="12" r="10"/>
                 <polyline points="12 6 12 12 16 14"/>
               </svg>
-              <span>Seg a sex — 9h às 18h</span>
+              <span>Seg a sex — 9h às 19h</span>
             </li>
           </ul>
         </div>
