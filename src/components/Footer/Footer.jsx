@@ -27,12 +27,12 @@ export function Footer() {
             <img src={logo} alt={LOJA_NOME} />
             <div>
               <h3>{LOJA_NOME}</h3>
-              
+              <p>Papelaria & Presentes</p>
             </div>
           </div>
           <p className="footer-desc">
             Papelaria criativa feita com muito carinho pra deixar seu dia mais
-            fofo e organizado.
+            fofo e organizado. 💕
           </p>
           <div className="footer-social">
             <a
@@ -90,7 +90,7 @@ export function Footer() {
             <ul className="footer-links">
               {categoriasReais.map((cat) => (
                 <li key={cat}>
-                  <Link to="/produtos">{cat}</Link>
+                  <Link to={`/produtos?cat=${encodeURIComponent(cat)}`}>{cat}</Link>
                 </li>
               ))}
             </ul>
