@@ -1,0 +1,57 @@
+Política de Privacidade e Declaração de Conteúdo
+Catálogo Cantinho da Lanna
+Versão 1.0.0 — Última atualização: 29/09/2026
+
+
+═══════════════════════════════════════════════
+   DECLARAÇÃO DE CONTEÚDO
+═══════════════════════════════════════════════
+
+Este instalador irá criar os seguintes itens no seu computador:
+
+  • Atalho na Área de Trabalho
+  • Atalho no Menu Iniciar
+  • Pasta de instalação em Arquivos de Programas
+  • Registro no sistema para desinstalação
+  • Arquivos do aplicativo Catálogo Cantinho da Lanna
+
+Nenhum arquivo pessoal seu será acessado, modificado ou removido.
+A desinstalação remove todos os arquivos criados pelo aplicativo.
+
+
+═══════════════════════════════════════════════
+   POLÍTICA DE PRIVACIDADE
+═══════════════════════════════════════════════
+
+1. COLETA DE INFORMAÇÕES
+Este aplicativo funciona localmente. Não coletamos, armazenamos ou
+transmitimos dados pessoais para servidores externos. As informações
+de produtos, categorias e configurações são salvas apenas no seu
+computador e, opcionalmente, em um repositório privado do GitHub de
+propriedade do desenvolvedor.
+
+2. USO DAS INFORMAÇÕES
+Todas as informações inseridas no aplicativo são de uso exclusivo do
+administrador para gestão do catálogo. Nenhum dado é usado para
+marketing, análise ou compartilhamento com terceiros.
+
+3. SEGURANÇA DOS DADOS
+Como os dados ficam armazenados localmente, a segurança depende das
+práticas de segurança do seu computador. Recomendamos o uso de
+senhas fortes e não compartilhar seu token de acesso.
+
+4. ALTERAÇÕES NESTA POLÍTICA
+Esta política pode ser atualizada periodicamente. Recomendamos
+revisá-la periodicamente.
+
+5. CONTATO
+Em caso de dúvidas, entre em contato pelo e-mail:
+cantinhodalannaoficial@gmail.com
+
+
+═══════════════════════════════════════════════
+
+Ao clicar em "Aceito" você concorda com os termos acima e autoriza
+a instalação do aplicativo no seu computador.
+
+© 2026 Cantinho da Lanna. Todos os direitos reservados.

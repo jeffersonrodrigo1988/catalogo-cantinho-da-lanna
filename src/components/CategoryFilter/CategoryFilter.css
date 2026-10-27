@@ -1,0 +1,26 @@
+.category-filter {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.chip {
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--brown);
+  font-size: 0.9rem;
+  box-shadow: var(--shadow);
+  transition: all 0.2s;
+}
+
+.chip:hover {
+  background: var(--pink);
+  color: var(--white);
+}
+
+.chip.active {
+  background: var(--pink-dark);
+  color: var(--white);
+  font-weight: 600;
+}

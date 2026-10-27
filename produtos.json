@@ -1,0 +1,109 @@
+{
+  "categories": [
+    "Adesivos",
+    "Calendários",
+    "Tags",
+    "Flores",
+    "Envelopes",
+    "Kit Festa"
+  ],
+  "pricing": {
+    "valorHora": 8
+  },
+  "products": [
+    {
+      "name": "Topo de Bolo Corinthians",
+      "description": "Topo de Bolo Corinthians",
+      "images": [
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790514540-1790514540.png",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790514993-1790514993.png",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790515023-1790515023.png",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790515026-1790515026.png"
+      ],
+      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790514540-1790514540.png",
+      "category": "Topos de Bolo",
+      "stock": 1,
+      "featured": false,
+      "id": "1790483569491"
+    },
+    {
+      "name": "Adesivo Redondo Tema Sonic",
+      "description": "Adesivo Redondo Tema Sonic",
+      "images": [
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790526044-1790526044.jpg",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790526046-1790526046.jpg"
+      ],
+      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790526044-1790526044.jpg",
+      "category": "Adesivos",
+      "stock": 20,
+      "featured": false,
+      "id": "1790526052322"
+    },
+    {
+      "name": "Envelope Dízimos e Ofertas",
+      "description": "Envelope Dízimos e Ofertas",
+      "images": [
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527262-1790527262.jpg",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527264-1790527264.jpg",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527265-1790527265.jpg"
+      ],
+      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527262-1790527262.jpg",
+      "category": "Envelopes",
+      "stock": 50,
+      "featured": true,
+      "id": "1790527295626"
+    },
+    {
+      "name": "Topo de Bolo Letra decorada Com Flores",
+      "description": "Surpreenda com uma decoração sofisticada e cheia de charme!\nFeito com camadas de papel Color Plus 180g, lamicote dourado e recorte manual, trazendo um toque artesanal e delicado.\n\n📌 Perfeito para qualquer ocasião especial!\n🔖 Detalhes que fazem toda a diferença na sua festa",
+      "images": [
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527511-1790527511.jpg",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527513-1790527513.jpg",
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527514-1790527514.jpg"
+      ],
+      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790527511-1790527511.jpg",
+      "category": "Flores",
+      "stock": 1,
+      "featured": true,
+      "id": "1790527539112"
+    },
+    {
+      "name": "Tag Embalado Com Amor",
+      "description": "Produto do Cantinho da Lanna 💕",
+      "images": [
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790528175-1790528175.jpg"
+      ],
+      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790528175-1790528175.jpg",
+      "category": "Tags",
+      "stock": 20,
+      "featured": false,
+      "id": "1790528182429"
+    },
+    {
+      "name": "Mini Calendário",
+      "description": "Mini Calendário 🤩",
+      "images": [
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790528289-1790528289.jpg"
+      ],
+      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1790528289-1790528289.jpg",
+      "category": "Calendários",
+      "stock": 10,
+      "featured": true,
+      "id": "1790528313510"
+    }
+  ],
+  "orcamentos": [],
+  "insumos": [
+    {
+      "nome": "Papel Sulfite",
+      "precoPacote": 32,
+      "quantidadePacote": 500,
+      "unidade": "un",
+      "id": "1790629118136"
+    }
+  ],
+  "custosFixos": {
+    "itens": [],
+    "horasPorMes": 160
+  }
+}
