@@ -7,17 +7,14 @@ export default defineConfig({
   server: {
     port: 1420,
     strictPort: true,
-    watch: {
-      ignored: ['**/src-tauri/**'],
-    },
   },
   build: {
     target: 'esnext',
     rollupOptions: {
-      external: ['@tauri-apps/api/core', '@tauri-apps/api', '@tauri-apps/plugin-opener'],
+      external: ['@tauri-apps/api/core', '@tauri-apps/api', '@tauri-apps/plugin-opener', '@tauri-apps/plugin-dialog', '@tauri-apps/plugin-fs'],
     },
   },
   optimizeDeps: {
-    exclude: ['@tauri-apps/api/core'],
+    exclude: ['@tauri-apps/api/core', '@tauri-apps/plugin-dialog', '@tauri-apps/plugin-fs'],
   },
 });

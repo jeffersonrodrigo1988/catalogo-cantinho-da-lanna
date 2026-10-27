@@ -1,7 +1,5 @@
 import { useRef } from 'react';
 import html2canvas from 'html2canvas';
-import { save } from '@tauri-apps/plugin-dialog';
-import { writeFile } from '@tauri-apps/plugin-fs';
 import './TalaoTopoBolo.css';
 
 export function TalaoTopoBolo({ order, client, onPrint }) {
@@ -20,16 +18,7 @@ export function TalaoTopoBolo({ order, client, onPrint }) {
     if (!talaoRef.current) return;
 
     try {
-      // Abre diálogo "Salvar como"
-      const filePath = await save({
-        title: 'Salvar Talão',
-        defaultPath: `talao_${(client?.name || order.clientName || 'pedido').replace(/\s+/g, '_')}.png`,
-        filters: [{ name: 'Imagem PNG', extensions: ['png'] }],
-      });
-
-      if (!filePath) return;
-
-      // Captura o talão no tamanho NATURAL (sem forçar nada)
+      // Captura o talão
       const canvas = await html2canvas(talaoRef.current, {
         scale: 2,
         backgroundColor: '#ffffff',
@@ -38,11 +27,47 @@ export function TalaoTopoBolo({ order, client, onPrint }) {
       });
 
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-      const arrayBuffer = await blob.arrayBuffer();
-      const uint8Array = new Uint8Array(arrayBuffer);
+      const fileName = `talao_${(client?.name || order.clientName || 'pedido').replace(/\s+/g, '_')}.png`;
 
-      await writeFile(filePath, uint8Array);
-      alert('✅ Talão salvo com sucesso!');
+      // Verifica se está no ambiente Tauri (app desktop)
+      if (window.__TAURI__) {
+        try {
+          // Importa dinamicamente só no Tauri
+          const { save } = await import('@tauri-apps/plugin-dialog');
+          const { writeFile } = await import('@tauri-apps/plugin-fs');
+
+          const filePath = await save({
+            title: 'Salvar Talão',
+            defaultPath: fileName,
+            filters: [{ name: 'Imagem PNG', extensions: ['png'] }],
+          });
+
+          if (!filePath) return;
+
+          const arrayBuffer = await blob.arrayBuffer();
+          const uint8Array = new Uint8Array(arrayBuffer);
+          await writeFile(filePath, uint8Array);
+          alert('✅ Talão salvo com sucesso!');
+        } catch (err) {
+          console.error('Erro Tauri:', err);
+          // Fallback: download direto se der erro no Tauri
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.download = fileName;
+          link.href = url;
+          link.click();
+          URL.revokeObjectURL(url);
+        }
+      } else {
+        // Navegador/Vercel: download direto
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+        alert('✅ Talão baixado!');
+      }
     } catch (err) {
       console.error('Erro ao salvar:', err);
       alert('Erro ao salvar: ' + err.message);
