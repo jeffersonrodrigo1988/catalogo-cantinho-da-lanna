@@ -90,26 +90,6 @@
       "stock": 10,
       "featured": true,
       "id": "1790528313510"
-    },
-    {
-      "name": "Safari",
-      "description": "Produto do Cantinho da Lanna 💕",
-      "images": [
-        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1794347079946-1794347079946.jpeg"
-      ],
-      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1794347079946-1794347079946.jpeg",
-      "category": "Topos de Bolo",
-      "stock": 1,
-      "featured": true,
-      "custoMateriais": 0,
-      "materiaisUsados": [],
-      "horasTrabalho": 0,
-      "custosExtras": 0,
-      "margemLucro": 100,
-      "precoManual": null,
-      "precoSugerido": 0,
-      "lucro": 0,
-      "id": "1794347088055"
     }
   ],
   "orcamentos": [],
