@@ -90,6 +90,26 @@
       "stock": 10,
       "featured": true,
       "id": "1790528313510"
+    },
+    {
+      "name": "Safari",
+      "description": "Produzido no papel fotográfico 180g",
+      "images": [
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1794347576989-1794347576989.jpeg"
+      ],
+      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1794347576989-1794347576989.jpeg",
+      "category": "Topos de Bolo",
+      "stock": 1,
+      "featured": true,
+      "custoMateriais": 0,
+      "materiaisUsados": [],
+      "horasTrabalho": 0,
+      "custosExtras": 0,
+      "margemLucro": 100,
+      "precoManual": null,
+      "precoSugerido": 0,
+      "lucro": 0,
+      "id": "1794347612850"
     }
   ],
   "orcamentos": [],
