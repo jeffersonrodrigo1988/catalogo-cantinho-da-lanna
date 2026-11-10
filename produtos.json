@@ -93,11 +93,11 @@
     },
     {
       "name": "Safari",
-      "description": "Produzido no papel fotográfico 180g",
+      "description": "Produto do Cantinho da Lanna 💕",
       "images": [
-        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1794346982654-1794346982654.jpeg"
+        "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1794347079946-1794347079946.jpeg"
       ],
-      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1794346982654-1794346982654.jpeg",
+      "image": "https://raw.githubusercontent.com/jeffersonrodrigo1988/catalogo-cantinho-da-lanna/main/imagens/1794347079946-1794347079946.jpeg",
       "category": "Topos de Bolo",
       "stock": 1,
       "featured": true,
@@ -109,7 +109,7 @@
       "precoManual": null,
       "precoSugerido": 0,
       "lucro": 0,
-      "id": "1794347017195"
+      "id": "1794347088055"
     }
   ],
   "orcamentos": [],
